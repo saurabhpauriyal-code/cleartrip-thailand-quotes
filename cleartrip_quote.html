@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cleartrip Holiday Quote Generator</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ct-orange: #F77B20; --ct-orange-light: #FFF3EB; --ct-orange-dark: #C4601A;
+  --ct-dark: #1A1A2E; --ct-gray: #6B7280; --ct-border: rgba(0,0,0,0.1); --ct-surface: #FAFAFA;
+  --font-display: 'Playfair Display', serif; --font-body: 'DM Sans', sans-serif;
+}
+body { font-family: var(--font-body); background: #f3f4f6; min-height: 100vh; }
+
+/* NAV */
+.nav { background:#fff; border-bottom:2px solid var(--ct-orange); padding:12px 32px; display:flex; align-items:center; justify-content:space-between; }
+.nav-logo { display:flex; align-items:center; gap:12px; }
+.nav-logo img { height:38px; width:auto; object-fit:contain; }
+.nav-brand { font-family:var(--font-display); font-size:20px; color:var(--ct-dark); font-weight:600; }
+.nav-brand span { color:var(--ct-orange); }
+.nav-sub { font-size:12px; color:var(--ct-gray); letter-spacing:1px; text-transform:uppercase; }
+.nav-right { font-size:13px; color:var(--ct-gray); display:flex; align-items:center; gap:6px; }
+
+/* SCREENS */
+.screen { display:none; }
+.screen.active { display:block; }
+
+/* FORM */
+.form-container { max-width:720px; margin:40px auto; padding:0 24px 60px; }
+.form-hero { text-align:center; margin-bottom:36px; }
+.form-hero-badge { display:inline-flex; align-items:center; gap:6px; background:var(--ct-orange-light); color:var(--ct-orange-dark); font-size:12px; font-weight:500; padding:6px 14px; border-radius:20px; margin-bottom:12px; letter-spacing:0.5px; text-transform:uppercase; }
+.form-hero h1 { font-family:var(--font-display); font-size:32px; color:var(--ct-dark); font-weight:600; line-height:1.2; margin-bottom:8px; }
+.form-hero h1 span { color:var(--ct-orange); }
+.form-hero p { color:var(--ct-gray); font-size:15px; }
+.form-card { background:#fff; border-radius:16px; border:0.5px solid var(--ct-border); overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.06); }
+.form-section { padding:24px 28px; border-bottom:0.5px solid var(--ct-border); }
+.form-section:last-child { border-bottom:none; }
+.form-section-title { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--ct-orange); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:18px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.form-field { display:flex; flex-direction:column; gap:6px; }
+.form-field label { font-size:13px; color:var(--ct-gray); font-weight:500; }
+.form-field select, .form-field input[type="text"] {
+  height:44px; padding:0 14px; border:1px solid var(--ct-border); border-radius:10px;
+  font-family:var(--font-body); font-size:14px; color:var(--ct-dark); background:var(--ct-surface);
+  outline:none; transition:border-color 0.2s; width:100%; appearance:none; -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 14px center; padding-right:36px;
+}
+.form-field input[type="text"] { background-image:none; padding-right:14px; }
+.form-field select:focus, .form-field input:focus { border-color:var(--ct-orange); background:#fff; }
+.pax-row { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:0.5px solid var(--ct-border); }
+.pax-row:last-child { border-bottom:none; }
+.pax-label { font-size:14px; color:var(--ct-dark); font-weight:500; }
+.pax-sub { font-size:11px; color:var(--ct-gray); margin-top:2px; }
+.pax-counter { display:flex; align-items:center; border:1px solid var(--ct-border); border-radius:10px; overflow:hidden; }
+.pax-btn { width:36px; height:36px; border:none; background:var(--ct-surface); cursor:pointer; font-size:18px; color:var(--ct-orange); font-weight:600; display:flex; align-items:center; justify-content:center; transition:background 0.15s; font-family:var(--font-body); }
+.pax-btn:hover { background:var(--ct-orange-light); }
+.pax-btn:disabled { color:#ccc; cursor:not-allowed; }
+.pax-num { width:40px; text-align:center; font-size:15px; font-weight:600; color:var(--ct-dark); background:#fff; border-left:0.5px solid var(--ct-border); border-right:0.5px solid var(--ct-border); line-height:36px; }
+.generate-btn { width:100%; height:52px; background:var(--ct-orange); color:#fff; border:none; border-radius:12px; font-family:var(--font-body); font-size:16px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:24px; transition:background 0.2s, transform 0.1s; }
+.generate-btn:hover { background:var(--ct-orange-dark); }
+.generate-btn:active { transform:scale(0.99); }
+.err-msg { font-size:13px; color:#E24B4A; display:none; margin-bottom:12px; padding:10px 14px; background:#FFF5F5; border-radius:8px; border-left:3px solid #E24B4A; }
+
+/* QUOTE SCREEN */
+.quote-screen { max-width:900px; margin:0 auto; padding:32px 24px 80px; }
+.quote-actions-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+.back-btn { display:flex; align-items:center; gap:6px; font-size:14px; color:var(--ct-gray); background:none; border:none; cursor:pointer; font-family:var(--font-body); padding:8px 0; font-weight:500; }
+.back-btn:hover { color:var(--ct-orange); }
+.action-btns { display:flex; gap:10px; }
+.action-btn { display:flex; align-items:center; gap:6px; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:500; cursor:pointer; font-family:var(--font-body); border:1.5px solid var(--ct-border); background:#fff; color:var(--ct-dark); transition:all 0.15s; }
+.action-btn:hover { border-color:var(--ct-orange); color:var(--ct-orange); }
+.action-btn.primary { background:var(--ct-orange); color:#fff; border-color:var(--ct-orange); }
+.action-btn.primary:hover { background:var(--ct-orange-dark); }
+
+/* AGENT COST SUMMARY */
+.agent-summary {
+  background:#1a1a2e; border-radius:14px; padding:20px 24px; margin-bottom:24px;
+  border:1.5px dashed #F77B20;
+}
+.agent-summary-title {
+  display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600;
+  color:#F77B20; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:14px;
+}
+.agent-summary-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; }
+.agent-cost-card {
+  background:rgba(255,255,255,0.06); border-radius:10px; padding:12px 14px;
+  border:0.5px solid rgba(255,255,255,0.1);
+}
+.agent-cost-label { font-size:11px; color:rgba(255,255,255,0.5); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; }
+.agent-cost-value { font-size:16px; font-weight:600; color:#FFB06A; font-family:var(--font-display); }
+.agent-cost-sub { font-size:10px; color:rgba(255,255,255,0.35); margin-top:2px; }
+.agent-badge { display:inline-flex; align-items:center; gap:5px; background:#F77B20; color:#fff; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; letter-spacing:0.5px; text-transform:uppercase; }
+
+/* QUOTE DOCUMENT */
+#quoteDoc { background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 4px 32px rgba(0,0,0,0.08); }
+.q-header { padding:20px 32px 18px; border-bottom:3px solid var(--ct-orange); display:flex; justify-content:space-between; align-items:center; }
+.q-header-left { display:flex; align-items:center; gap:16px; }
+.q-logo-img { height:80px; width:auto; object-fit:contain; flex-shrink:0; }
+.q-company-name { font-family:var(--font-display); font-size:17px; font-weight:600; color:var(--ct-dark); margin-bottom:3px; }
+.q-company-addr { font-size:12px; color:var(--ct-gray); line-height:1.6; }
+.q-header-right { text-align:right; font-size:12px; color:var(--ct-gray); line-height:1.8; }
+.q-header-right .q-seller-name { font-size:13px; font-weight:600; color:var(--ct-dark); }
+.q-header-right .q-seller-role { font-size:11px; color:var(--ct-orange); font-weight:500; text-transform:uppercase; letter-spacing:0.5px; }
+.q-header-right .q-phone { color:var(--ct-dark); font-weight:500; }
+.q-valid { display:inline-block; background:var(--ct-orange-light); color:var(--ct-orange-dark); font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; margin-top:3px; }
+.q-banner { background:linear-gradient(135deg, #2D1B69 0%, #1a3a5c 50%, #0F3460 100%); padding:28px 32px; position:relative; overflow:hidden; }
+.q-banner::before { content:''; position:absolute; top:-30px; right:-30px; width:200px; height:200px; background:var(--ct-orange); opacity:0.12; border-radius:50%; }
+.q-banner::after { content:''; position:absolute; bottom:-50px; left:40%; width:150px; height:150px; background:#FFB380; opacity:0.08; border-radius:50%; }
+.q-banner-top { display:flex; justify-content:space-between; align-items:flex-start; position:relative; }
+.q-dest-tag { display:inline-flex; align-items:center; gap:6px; background:rgba(247,123,32,0.25); color:#FFD4A8; font-size:12px; font-weight:600; padding:5px 12px; border-radius:20px; margin-bottom:10px; letter-spacing:0.5px; text-transform:uppercase; }
+.q-banner h2 { font-family:var(--font-display); font-size:28px; color:#fff; font-weight:600; line-height:1.2; margin-bottom:6px; }
+.q-banner h2 span { color:#FFB06A; }
+.q-banner-sub { color:rgba(255,255,255,0.65); font-size:14px; }
+.q-price-pill { background:var(--ct-orange); color:#fff; padding:14px 22px; border-radius:14px; text-align:center; flex-shrink:0; border:1.5px solid rgba(255,255,255,0.2); }
+.q-price-pill .price-label { font-size:11px; opacity:0.9; letter-spacing:0.5px; text-transform:uppercase; }
+.q-price-pill .price-val { font-family:var(--font-display); font-size:26px; font-weight:600; line-height:1.1; }
+.q-price-pill .price-sub { font-size:11px; opacity:0.85; }
+.q-banner-chips { display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; position:relative; }
+.q-chip { display:flex; align-items:center; gap:5px; background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.9); font-size:12px; padding:5px 12px; border-radius:20px; border:0.5px solid rgba(255,255,255,0.2); }
+.q-chip i { font-size:13px; color:#FFB06A; }
+.q-body { padding:28px 32px; }
+.q-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+.q-info-card { background:var(--ct-orange-light); border-radius:12px; padding:16px 20px; border-left:3px solid var(--ct-orange); }
+.q-info-card-title { font-size:11px; font-weight:600; color:var(--ct-orange-dark); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.q-info-row { display:flex; justify-content:space-between; font-size:13px; padding:3px 0; }
+.q-info-row .k { color:var(--ct-gray); } .q-info-row .v { font-weight:500; color:var(--ct-dark); }
+.q-flight-card { background:#F0F5FF; border:0.5px solid #B5D4F4; border-left:3px solid #378ADD; border-radius:12px; padding:16px 20px; margin-bottom:24px; }
+.q-flight-title { font-size:11px; font-weight:600; color:#185FA5; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+.q-flight-title i { font-size:14px; color:#378ADD; }
+.q-flight-rows { display:flex; flex-direction:column; gap:10px; }
+.q-flight-row { display:flex; align-items:center; background:#fff; border-radius:10px; border:0.5px solid #B5D4F4; padding:12px 16px; }
+.q-flight-leg { display:flex; flex-direction:column; align-items:center; min-width:72px; }
+.q-flight-code { font-family:var(--font-display); font-size:22px; font-weight:600; color:var(--ct-dark); line-height:1; }
+.q-flight-city { font-size:11px; color:var(--ct-gray); margin-top:3px; }
+.q-flight-mid { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; padding:0 12px; }
+.q-flight-arrow { display:flex; align-items:center; width:100%; gap:4px; }
+.q-flight-line { flex:1; height:1.5px; background:#B5D4F4; }
+.q-flight-plane { font-size:16px; color:#378ADD; }
+.q-flight-label { font-size:11px; color:#185FA5; font-weight:500; background:#E6F1FB; padding:2px 10px; border-radius:20px; }
+.q-incl { background:#F0FAF5; border-radius:12px; padding:16px 20px; margin-bottom:24px; border-left:3px solid #1D9E75; }
+.q-incl-title { font-size:11px; font-weight:600; color:#0F6E56; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+.q-incl-list { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.q-incl-item { display:flex; align-items:center; gap:6px; font-size:13px; color:#085041; }
+.q-incl-item i { font-size:14px; color:#1D9E75; flex-shrink:0; }
+.q-section-head { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.q-section-head .line { flex:1; height:0.5px; background:var(--ct-border); }
+.q-section-head span { font-size:12px; font-weight:600; color:var(--ct-orange); text-transform:uppercase; letter-spacing:1px; white-space:nowrap; }
+.itinerary-list { display:flex; flex-direction:column; }
+.itin-card { display:flex; position:relative; }
+.itin-timeline { width:52px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; padding-top:6px; position:relative; }
+.itin-dot { width:32px; height:32px; border-radius:50%; background:var(--ct-orange); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; z-index:1; flex-shrink:0; }
+.itin-content { flex:1; padding:0 0 20px 8px; }
+.itin-day-label { font-size:11px; font-weight:700; color:var(--ct-orange); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+.itin-activity { background:var(--ct-surface); border:0.5px solid var(--ct-border); border-radius:10px; padding:12px 16px; font-size:13.5px; color:var(--ct-dark); line-height:1.5; }
+.itin-activity.arrival { border-left:2.5px solid #1D9E75; }
+.itin-activity.departure { border-left:2.5px solid var(--ct-orange); }
+.itin-activity.transfer { border-left:2.5px solid #378ADD; }
+.itin-activity.activity { border-left:2.5px solid #D4537E; }
+.hotel-card { background:var(--ct-surface); border:0.5px solid var(--ct-border); border-radius:12px; padding:14px 18px; }
+.hotel-card-head { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.hotel-icon-box { width:32px; height:32px; background:var(--ct-orange-light); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.hotel-city { font-size:13px; font-weight:600; color:var(--ct-dark); }
+.hotel-nights-tag { font-size:11px; color:var(--ct-gray); }
+.hotel-name { font-size:13px; color:var(--ct-dark); font-weight:500; }
+.hotel-meta { font-size:12px; color:var(--ct-gray); margin-top:2px; }
+.hotel-stars { display:flex; gap:2px; margin-top:5px; }
+.hotel-stars i { font-size:13px; color:#EF9F27; }
+.q-price-footer { margin-top:28px; background:linear-gradient(135deg, #1a3a5c 0%, #0F3460 100%); border-radius:14px; padding:22px 28px; display:flex; justify-content:space-between; align-items:center; }
+.q-pf-left { color:rgba(255,255,255,0.75); font-size:13px; line-height:1.9; }
+.q-pf-left strong { color:#fff; font-size:15px; display:block; margin-bottom:4px; }
+.q-pf-right { text-align:right; }
+.q-pf-pax { color:rgba(255,255,255,0.55); font-size:12px; margin-bottom:4px; }
+.q-pf-amount { font-family:var(--font-display); font-size:36px; font-weight:600; color:#FFB06A; }
+.q-pf-note { color:rgba(255,255,255,0.4); font-size:11px; margin-top:4px; }
+.q-notes { margin-top:20px; background:#FFFBF5; border:0.5px solid #FFD5A8; border-radius:12px; padding:16px 20px; }
+.q-notes-title { font-size:11px; font-weight:600; color:#854F0B; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.q-notes-title i { font-size:14px; color:var(--ct-orange); }
+.q-notes-list { display:flex; flex-direction:column; gap:6px; }
+.q-notes-item { display:flex; align-items:flex-start; gap:8px; font-size:12px; color:#633806; line-height:1.55; }
+.q-notes-item::before { content:'•'; color:var(--ct-orange); font-size:14px; flex-shrink:0; line-height:1.4; }
+.q-footer-website { text-align:center; margin-top:16px; padding:10px; border-top:0.5px solid var(--ct-border); }
+.q-footer-website a { font-size:12px; color:var(--ct-orange); text-decoration:none; font-weight:500; }
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:#1a3a5c; color:#fff; padding:12px 24px; border-radius:30px; font-size:14px; font-weight:500; display:flex; align-items:center; gap:8px; transition:transform 0.3s ease; z-index:1000; pointer-events:none; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast i { color:#4ade80; }
+
+/* PRINT / PDF — only quote doc visible, everything else hidden */
+@media print {
+  body { background:#fff !important; }
+  .nav, .quote-actions-bar, .agent-summary, .toast { display:none !important; }
+  .quote-screen { padding:0 !important; max-width:100% !important; }
+  #quoteDoc { box-shadow:none !important; border-radius:0 !important; }
+  .q-footer-website a { color:#F77B20 !important; }
+}
+
+/* ── ADMIN PANEL ── */
+.admin-lock-btn {
+  display:flex; align-items:center; gap:6px; padding:7px 14px;
+  background:var(--ct-orange-light); color:var(--ct-orange-dark);
+  border:1px solid #FFD5A8; border-radius:8px; cursor:pointer;
+  font-family:var(--font-body); font-size:13px; font-weight:600;
+  transition:all 0.15s;
+}
+.admin-lock-btn:hover { background:var(--ct-orange); color:#fff; border-color:var(--ct-orange); }
+
+/* Login overlay */
+.admin-login-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:200;
+  display:flex; align-items:center; justify-content:center;
+}
+.admin-login-box {
+  background:#fff; border-radius:16px; padding:36px 32px; width:360px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.18); text-align:center;
+}
+.admin-login-box h2 { font-family:var(--font-display); font-size:22px; color:var(--ct-dark); margin-bottom:6px; }
+.admin-login-box p  { font-size:13px; color:var(--ct-gray); margin-bottom:24px; }
+.admin-login-box input {
+  width:100%; height:44px; border:1px solid var(--ct-border); border-radius:10px;
+  padding:0 14px; font-family:var(--font-body); font-size:14px; outline:none;
+  margin-bottom:12px; transition:border-color 0.2s;
+}
+.admin-login-box input:focus { border-color:var(--ct-orange); }
+.admin-login-btn {
+  width:100%; height:44px; background:var(--ct-orange); color:#fff; border:none;
+  border-radius:10px; font-family:var(--font-body); font-size:15px; font-weight:600;
+  cursor:pointer; transition:background 0.2s;
+}
+.admin-login-btn:hover { background:var(--ct-orange-dark); }
+.admin-login-err { font-size:12px; color:#E24B4A; margin-top:8px; display:none; }
+.admin-cancel-btn {
+  margin-top:12px; background:none; border:none; font-size:13px; color:var(--ct-gray);
+  cursor:pointer; font-family:var(--font-body); text-decoration:underline;
+}
+
+/* Admin screen */
+.admin-container { max-width:960px; margin:0 auto; padding:32px 24px 80px; }
+.admin-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; }
+.admin-header h1 { font-family:var(--font-display); font-size:26px; color:var(--ct-dark); }
+.admin-header h1 span { color:var(--ct-orange); }
+.admin-save-btn {
+  display:flex; align-items:center; gap:6px; padding:10px 22px;
+  background:var(--ct-orange); color:#fff; border:none; border-radius:10px;
+  font-family:var(--font-body); font-size:14px; font-weight:600; cursor:pointer;
+  transition:background 0.2s;
+}
+.admin-save-btn:hover { background:var(--ct-orange-dark); }
+.admin-logout-btn {
+  display:flex; align-items:center; gap:6px; padding:10px 16px;
+  background:#fff; color:var(--ct-gray); border:1.5px solid var(--ct-border);
+  border-radius:10px; font-family:var(--font-body); font-size:13px; font-weight:500;
+  cursor:pointer; transition:all 0.15s; margin-left:10px;
+}
+.admin-logout-btn:hover { border-color:#E24B4A; color:#E24B4A; }
+
+.admin-section {
+  background:#fff; border-radius:16px; border:0.5px solid var(--ct-border);
+  box-shadow:0 2px 12px rgba(0,0,0,0.05); margin-bottom:20px; overflow:hidden;
+}
+.admin-section-head {
+  padding:16px 24px; background:var(--ct-surface); border-bottom:0.5px solid var(--ct-border);
+  display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;
+  color:var(--ct-orange); text-transform:uppercase; letter-spacing:0.8px;
+}
+.admin-section-body { padding:20px 24px; }
+
+.admin-table { width:100%; border-collapse:collapse; font-size:13px; }
+.admin-table th {
+  text-align:left; padding:8px 10px; font-size:11px; font-weight:600;
+  color:var(--ct-gray); text-transform:uppercase; letter-spacing:0.6px;
+  border-bottom:1px solid var(--ct-border);
+}
+.admin-table td { padding:8px 10px; border-bottom:0.5px solid var(--ct-border); color:var(--ct-dark); }
+.admin-table tr:last-child td { border-bottom:none; }
+.admin-table .row-label { font-weight:500; color:var(--ct-dark); white-space:nowrap; }
+
+.admin-input {
+  width:100%; height:36px; border:1px solid var(--ct-border); border-radius:8px;
+  padding:0 10px; font-family:var(--font-body); font-size:13px; color:var(--ct-dark);
+  background:var(--ct-surface); outline:none; transition:border-color 0.2s;
+}
+.admin-input:focus { border-color:var(--ct-orange); background:#fff; }
+.admin-input.wide { width:220px; }
+
+.admin-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.admin-field { display:flex; flex-direction:column; gap:5px; }
+.admin-field label { font-size:12px; color:var(--ct-gray); font-weight:500; }
+
+@media print { .admin-login-overlay, #screenAdmin { display:none !important; } }
+
+
+/* ── ADMIN PANEL ── */
+.admin-lock-btn { display:flex; align-items:center; gap:6px; background:none; border:1.5px solid var(--ct-border); border-radius:8px; padding:6px 12px; cursor:pointer; font-family:var(--font-body); font-size:13px; color:var(--ct-gray); transition:all 0.15s; }
+.admin-lock-btn:hover { border-color:var(--ct-orange); color:var(--ct-orange); }
+.admin-lock-btn i { font-size:15px; }
+
+/* Login overlay */
+.admin-overlay { position:fixed; inset:0; background:rgba(15,20,40,0.85); z-index:2000; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+.admin-overlay.open { display:flex; }
+.admin-login-box { background:#fff; border-radius:20px; padding:40px 36px; width:360px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.admin-login-box h2 { font-family:var(--font-display); font-size:22px; color:var(--ct-dark); margin-bottom:6px; }
+.admin-login-box p { font-size:13px; color:var(--ct-gray); margin-bottom:24px; }
+.admin-pw-input { width:100%; height:46px; border:1.5px solid var(--ct-border); border-radius:10px; padding:0 14px; font-family:var(--font-body); font-size:14px; color:var(--ct-dark); outline:none; text-align:center; letter-spacing:2px; }
+.admin-pw-input:focus { border-color:var(--ct-orange); }
+.admin-login-btn { width:100%; height:46px; background:var(--ct-orange); color:#fff; border:none; border-radius:10px; font-family:var(--font-body); font-size:15px; font-weight:600; cursor:pointer; margin-top:12px; transition:background 0.2s; }
+.admin-login-btn:hover { background:var(--ct-orange-dark); }
+.admin-login-err { font-size:12px; color:#E24B4A; margin-top:8px; display:none; }
+.admin-cancel-btn { background:none; border:none; font-family:var(--font-body); font-size:13px; color:var(--ct-gray); cursor:pointer; margin-top:12px; display:block; width:100%; }
+.admin-cancel-btn:hover { color:var(--ct-dark); }
+
+/* Admin screen */
+.admin-container { max-width:900px; margin:40px auto; padding:0 24px 80px; }
+.admin-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; }
+.admin-header h1 { font-family:var(--font-display); font-size:26px; color:var(--ct-dark); }
+.admin-header h1 span { color:var(--ct-orange); }
+.admin-save-bar { display:flex; gap:10px; }
+.admin-save-btn { display:flex; align-items:center; gap:6px; padding:10px 20px; background:var(--ct-orange); color:#fff; border:none; border-radius:10px; font-family:var(--font-body); font-size:14px; font-weight:600; cursor:pointer; transition:background 0.2s; }
+.admin-save-btn:hover { background:var(--ct-orange-dark); }
+.admin-reset-btn { display:flex; align-items:center; gap:6px; padding:10px 20px; background:#fff; color:#E24B4A; border:1.5px solid #E24B4A; border-radius:10px; font-family:var(--font-body); font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+.admin-reset-btn:hover { background:#FFF5F5; }
+.admin-logout-btn { display:flex; align-items:center; gap:6px; padding:10px 20px; background:#fff; color:var(--ct-gray); border:1.5px solid var(--ct-border); border-radius:10px; font-family:var(--font-body); font-size:14px; cursor:pointer; }
+.admin-logout-btn:hover { border-color:var(--ct-dark); color:var(--ct-dark); }
+
+.admin-card { background:#fff; border-radius:16px; border:0.5px solid var(--ct-border); box-shadow:0 2px 12px rgba(0,0,0,0.05); margin-bottom:20px; overflow:hidden; }
+.admin-card-head { padding:16px 24px; background:var(--ct-surface); border-bottom:0.5px solid var(--ct-border); display:flex; align-items:center; gap:8px; }
+.admin-card-head h3 { font-size:13px; font-weight:600; color:var(--ct-orange); text-transform:uppercase; letter-spacing:0.8px; }
+.admin-card-body { padding:20px 24px; }
+
+.admin-table { width:100%; border-collapse:collapse; }
+.admin-table th { font-size:11px; font-weight:600; color:var(--ct-gray); text-transform:uppercase; letter-spacing:0.6px; padding:6px 8px; text-align:left; border-bottom:1px solid var(--ct-border); }
+.admin-table td { padding:6px 8px; border-bottom:0.5px solid var(--ct-border); vertical-align:middle; }
+.admin-table tr:last-child td { border-bottom:none; }
+.admin-table td:first-child { font-size:13px; font-weight:500; color:var(--ct-dark); white-space:nowrap; }
+.admin-input { height:36px; padding:0 10px; border:1px solid var(--ct-border); border-radius:8px; font-family:var(--font-body); font-size:13px; color:var(--ct-dark); background:#fff; outline:none; width:100%; transition:border-color 0.2s; }
+.admin-input:focus { border-color:var(--ct-orange); }
+.admin-input.wide { width:220px; }
+.admin-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.admin-field { display:flex; flex-direction:column; gap:5px; }
+.admin-field label { font-size:11px; font-weight:600; color:var(--ct-gray); text-transform:uppercase; letter-spacing:0.5px; }
+.saved-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:#1D9E75; color:#fff; padding:12px 24px; border-radius:30px; font-size:14px; font-weight:500; display:flex; align-items:center; gap:8px; transition:transform 0.3s; z-index:3000; pointer-events:none; }
+.saved-toast.show { transform:translateX(-50%) translateY(0); }
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+
+<!-- LOADING BANNER -->
+<div id="loadingBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#F77B20,#C4601A);color:#fff;padding:10px 24px;align-items:center;justify-content:center;gap:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;">
+  <i class="ti ti-cloud" style="font-size:18px;animation:spin 1.5s linear infinite;"></i>
+  Syncing rates from cloud...
+</div>
+<style>@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}</style>
+
+<!-- ADMIN LOGIN OVERLAY -->
+<div class="admin-login-overlay" id="adminLoginOverlay" style="display:none;">
+  <div class="admin-login-box">
+    <div style="font-size:32px;margin-bottom:8px;">🔐</div>
+    <h2>Admin <span style="color:var(--ct-orange);">Access</span></h2>
+    <p>Enter your password to edit rates</p>
+    <input type="password" id="adminPwdInput" placeholder="Password" onkeydown="if(event.key==='Enter')checkAdminPwd()" />
+    <button class="admin-login-btn" onclick="checkAdminPwd()">Unlock</button>
+    <div class="admin-login-err" id="adminPwdErr">Incorrect password. Try again.</div>
+    <br/><button class="admin-cancel-btn" onclick="closeAdminLogin()">Cancel</button>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <img id="navLogo" src="data:image/png;base64,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" alt="Cleartrip" />
+    <div>
+      <div class="nav-brand">Clear<span>trip</span></div>
+      <div class="nav-sub">Holiday Quote Generator</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="nav-right" style="display:flex;align-items:center;gap:12px;">
+    <span style="display:flex;align-items:center;gap:5px;"><i class="ti ti-map-pin"></i> Thailand Packages</span>
+    <button class="admin-lock-btn" onclick="openAdminLogin()"><i class="ti ti-lock"></i> Admin</button>
+  </div>
+    <button class="admin-lock-btn" onclick="openAdminLogin()"><i class="ti ti-lock"></i> Admin</button>
+  </div>
+</nav>
+
+
+
+<!-- LOADING BANNER -->
+<div id="loadingBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#F77B20,#C4601A);color:#fff;padding:10px 24px;align-items:center;justify-content:center;gap:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;">
+  <i class="ti ti-cloud" style="font-size:18px;animation:spin 1.5s linear infinite;"></i>
+  Syncing rates from cloud...
+</div>
+<style>@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}</style>
+
+<!-- ADMIN LOGIN OVERLAY -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-login-box">
+    <div style="width:48px;height:48px;background:var(--ct-orange);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+      <i class="ti ti-lock" style="color:#fff;font-size:22px;"></i>
+    </div>
+    <h2>Admin Access</h2>
+    <p>Enter your password to edit rates</p>
+    <input type="password" class="admin-pw-input" id="adminPwInput" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')checkAdminPw()" />
+    <div class="admin-login-err" id="adminPwErr">Incorrect password. Try again.</div>
+    <button class="admin-login-btn" onclick="checkAdminPw()">Unlock</button>
+    <button class="admin-cancel-btn" onclick="closeAdminLogin()">Cancel</button>
+  </div>
+</div>
+
+<!-- SAVED TOAST -->
+<div class="saved-toast" id="savedToast"><i class="ti ti-circle-check"></i> Rates saved successfully!</div>
+
+<!-- ADMIN SCREEN -->
+<div id="screenAdmin" class="screen">
+  <div class="admin-container">
+    <div class="admin-header">
+      <h1>Rate <span>Editor</span></h1>
+      <div class="admin-save-bar">
+        <button class="admin-reset-btn" onclick="resetToDefaults()"><i class="ti ti-refresh"></i> Reset to Defaults</button>
+        <button class="admin-logout-btn" onclick="adminLogout()"><i class="ti ti-logout"></i> Logout</button>
+        <button class="admin-save-btn" onclick="saveRates()"><i class="ti ti-device-floppy"></i> Save All Rates</button>
+      </div>
+    </div>
+
+    <!-- FLIGHT FARES -->
+    <div class="admin-card">
+      <div class="admin-card-head"><i class="ti ti-plane" style="color:var(--ct-orange);font-size:16px;"></i><h3>Flight Fares (₹ per person)</h3></div>
+      <div class="admin-card-body">
+        <table class="admin-table">
+          <thead><tr><th>City → Dest</th><th>May</th><th>June</th><th>July</th><th>August</th></tr></thead>
+          <tbody id="flightRatesBody"></tbody>
+        </table>
+        <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--ct-border);">
+          <div class="admin-field" style="max-width:240px;">
+            <label>Infant Flat Flight Fare (₹)</label>
+            <input type="number" class="admin-input" id="infantFare" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOTEL RATES -->
+    <div class="admin-card">
+      <div class="admin-card-head"><i class="ti ti-building" style="color:var(--ct-orange);font-size:16px;"></i><h3>Hotel Rates (₹ per room per night)</h3></div>
+      <div class="admin-card-body" id="hotelRatesBody"></div>
+    </div>
+
+    <!-- ITINERARY COSTS -->
+    <div class="admin-card">
+      <div class="admin-card-head"><i class="ti ti-map-2" style="color:var(--ct-orange);font-size:16px;"></i><h3>Itinerary Costs (₹)</h3></div>
+      <div class="admin-card-body" id="itinRatesBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FORM SCREEN -->
+<div id="screenForm" class="screen active">
+  <div class="form-container">
+    <div class="form-hero">
+      <div class="form-hero-badge"><i class="ti ti-sparkles"></i> Thailand 2026</div>
+      <h1>Generate a Holiday <span>Quote</span></h1>
+      <p>Fill in the details below to create a personalised quote for your guest.</p>
+    </div>
+    <div class="form-card">
+      <!-- Trip Details -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="ti ti-map"></i> Trip Details</div>
+        <div class="form-grid" style="margin-bottom:16px;">
+          <div class="form-field"><label>Departure City</label>
+            <select id="depCity"><option value="">Select city...</option><option value="Delhi">Delhi</option><option value="Mumbai">Mumbai</option><option value="Bangalore">Bangalore</option><option value="Ahmedabad">Ahmedabad</option></select>
+          </div>
+          <div class="form-field"><label>Travel Month</label>
+            <select id="travelMonth"><option value="">Select month...</option><option value="May">May</option><option value="June">June</option><option value="July">July</option><option value="August">August</option></select>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-field"><label>Circuit</label>
+            <select id="circuit"><option value="">Select circuit...</option><option value="Bangkok - Pattaya">Bangkok – Pattaya</option><option value="Phuket - Krabi">Phuket – Krabi</option></select>
+          </div>
+          <div class="form-field"><label>Number of Nights</label>
+            <select id="nights"><option value="">Select nights...</option><option value="4">4 Nights</option><option value="5">5 Nights</option><option value="6">6 Nights</option></select>
+          </div>
+        </div>
+      </div>
+      <!-- Passengers -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="ti ti-users"></i> Passengers</div>
+        <div class="pax-row"><div><div class="pax-label">Adults</div><div class="pax-sub">Age 12 &amp; above</div></div><div class="pax-counter"><button class="pax-btn" onclick="changePax('adults',-1)" id="btn-adults-minus">−</button><div class="pax-num" id="val-adults">2</div><button class="pax-btn" onclick="changePax('adults',1)">+</button></div></div>
+        <div class="pax-row"><div><div class="pax-label">Children</div><div class="pax-sub">Age 2 – 11.9 yrs (with seat)</div></div><div class="pax-counter"><button class="pax-btn" onclick="changePax('children',-1)" id="btn-children-minus">−</button><div class="pax-num" id="val-children">0</div><button class="pax-btn" onclick="changePax('children',1)">+</button></div></div>
+        <div class="pax-row"><div><div class="pax-label">Infants</div><div class="pax-sub">Age 0 – 1.9 yrs · Flight only (₹10,000 flat)</div></div><div class="pax-counter"><button class="pax-btn" onclick="changePax('infants',-1)" id="btn-infants-minus">−</button><div class="pax-num" id="val-infants">0</div><button class="pax-btn" onclick="changePax('infants',1)">+</button></div></div>
+      </div>
+      <!-- Guest + Seller -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="ti ti-user-circle"></i> Guest & Seller Information</div>
+        <div class="form-grid">
+          <div class="form-field"><label>Guest Name</label><input type="text" id="guestName" placeholder="e.g. Mr. Rahul Sharma" /></div>
+          <div class="form-field"><label>Seller (Destination Expert)</label>
+            <select id="seller">
+              <option value="">Select seller...</option>
+              <option value="Vinay Kumar">Vinay Kumar</option>
+              <option value="Savita Joshi">Savita Joshi</option>
+              <option value="Amit Kumar">Amit Kumar</option>
+              <option value="Saurabh Pauriyal">Saurabh Pauriyal</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!-- Generate -->
+      <div class="form-section">
+        <div id="formError" class="err-msg"></div>
+        <button class="generate-btn" onclick="generateQuote()"><i class="ti ti-file-invoice"></i> Generate Quote</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUOTE SCREEN -->
+<div id="screenQuote" class="screen">
+  <div class="quote-screen">
+    <div class="quote-actions-bar">
+      <button class="back-btn" onclick="goBack()"><i class="ti ti-arrow-left"></i> Back to Form</button>
+      <div class="action-btns">
+        <button class="action-btn" onclick="copyWhatsApp()"><i class="ti ti-brand-whatsapp"></i> Copy for WhatsApp</button>
+        <button class="action-btn primary" onclick="downloadPDF()"><i class="ti ti-download"></i> Download PDF</button>
+      </div>
+    </div>
+
+    <!-- AGENT-ONLY COST SUMMARY (hidden on print) -->
+    <div class="agent-summary" id="agentSummary">
+      <div class="agent-summary-title">
+        <i class="ti ti-lock"></i> Internal Cost Breakdown
+        <span class="agent-badge">Agent View Only · Hidden on PDF</span>
+      </div>
+      <div class="agent-summary-grid">
+        <div class="agent-cost-card">
+          <div class="agent-cost-label">✈️ Flights</div>
+          <div class="agent-cost-value" id="aFlights">—</div>
+          <div class="agent-cost-sub" id="aFlightsSub">—</div>
+        </div>
+        <div class="agent-cost-card">
+          <div class="agent-cost-label">🏨 Hotels</div>
+          <div class="agent-cost-value" id="aHotels">—</div>
+          <div class="agent-cost-sub" id="aHotelsSub">—</div>
+        </div>
+        <div class="agent-cost-card">
+          <div class="agent-cost-label">🎟️ Itinerary</div>
+          <div class="agent-cost-value" id="aItin">—</div>
+          <div class="agent-cost-sub" id="aItinSub">—</div>
+        </div>
+        <div class="agent-cost-card">
+          <div class="agent-cost-label">💰 Grand Total</div>
+          <div class="agent-cost-value" id="aTotal">—</div>
+          <div class="agent-cost-sub" id="aTotalSub">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUOTE DOCUMENT -->
+    <div id="quoteDoc">
+      <div class="q-header">
+        <div class="q-header-left">
+          <img class="q-logo-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAa60lEQVR42u2deZgcVbn/P2/PZCEhCwlTPQkY9lWWABeI7AJKJMzUsAgCCgjKVXmuDwICcq/4Y1HQH6AsP1zQq4AKV5ZMdQKE3SsKgpewGVCWsIZM1wQSCRCSzPT7+2OCN0Ome3p6untqur+f55nngVR11an3nO+33nPq1CkQQgghhBBCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQpQdUwgqi7ek1yeVOwBsD7CdwLcGnwY2VtHpxUrgNeB54GnMHsP89zY7XqbQyACGl+hbg09jHAu0ARMVkUHxLjAb/CaLOu9SOGQAyRR92LwT5M4Gjlc0KspNYN+3KPuUQiEDSIDwgyOAy4FNFY2q8gpwhkXxbIVCBjAEwk8fCn4DMFnRGFI6gRMsiucpFDKAygv/yPRUunwesKOikSiexHOHWGZJrFAUT0ohGFC6fwFdvkjiTyTTsVTWw+A8hUIZQJnv+hPH0jXyKWALRWNY8BzdPt3mdq5SKGQAg+3rzwB/RJEYlq17urXHelqgLkCJ4m9tOkXiH84VyJMeBscoEDKAEu78Tedj9nNFYthzs4fpbygMMoCBiP8isAsUiZqp0Ss8DM5WHDQGUIT4gzPomdgjao8vWxQrq5MB5BV/C5BRJGq6yR9oUfZBxUEG0Fv8bVOm4d2vKhJ1QI60zYk1YUhjAGs7QPezCkLdtPq/KQgygLVT/9sBvZ9fP2zgYfBrhUFdALw1+BTGPWoKddn897Uo+0dlAPVtgXdKCHVr/3Vv/HVtAB4GlwKNEkLdsp6HwcXqAtSj+A+bNpKGD1ZKA3XPCoviMcoA6o2GD65W2697zq9n8ddtBuCfx1ge5NT+65Z7cdosE79f74Goz/7vci0aUacsB2ZZFD+kUNSzAcC3VPV1xyUWxTL+ejcAD9N7gmvST/2wAM8dqLUCZQAfWsCpqvY6wTjZ2uNfKhAygLX5vKq95rmfyd0z7T/f6lIoZABrpf/BZsBIVXstV7K1WCY7V4GQAfTFYarymmWORXGrwiADKMQBqvJa7OvbTGvP3q1AyAD64xOq8priLoviQxWG0qm3qcBTVOU1Q5vELwMoGj+iSeKvDR6hqbvRojhSKNQFKJ5u20zVPdxdnFMtE1+nQMgASmk8zVr/aNjyCthulsm+rVDIAErDmKTqHpZ836L4XIVBBjBYxqi6hxWrcNvDMll93FMGUBa0/uHw4W6L4pkKg0RR3lEAMRz4osSvDEDUH1lgJ4v0xR4ZgKgz7AaLsicmIk1sC47D2dCi+Cp1AYSovPhbEyP+MLgR5zdA3awXqQxADBWvk2vcwea8+c6QC7+leRKp3AKg+cN/kgEIUTn+06L4lGTc9dMtkKvbT8KrCyCqTZgc8Tf9BDxTz5WhDEBUi5icbW9zsm8NufBnjW6kcfwCYOt6rxQZgKgCdrtF2SMTcddvCXYihWYXqgsgqsSXEyP+sOk0iV8ZgKgOq8E+blH2hWSIP7gFOErVIgMQlU/551uU3S0Rwj9g40YmrHoe0HoQ6gKIKnBFYsTfkt6KCatWS/wyAFEdZlkUn5mQlP9IUv68qkRdAFF5ltPFVnZHnE2I+L8PnK1qkQGIyvOIRfFeSSmMh8G9wMGqFhlAUvkL8CzYG+DvAyOAjcF2B995eF2KX2ZR5zcTUZKT0imW+kJgEzUxGUCSeAz8Nzjtlul8rf87WPob4FckX/seWqYzEdNovTWYylJ/Ve1ZBpAUlgIX887Iq+3BN1YP5IcWZX8I/NDD4ClgpwRe2ypgS8t0vp4Q8X8C42E1ORlAUsTxeYviWwZ7IIvinT0MngW2S9D1PWdRvH2C+vsnANer2ckAksBNFsXHlfWI763embEjViXk+n5rUXx8gsR/CaDlwgeJ5gGUh38ru/gBu2/pauDCBFzf1xMm/lslfhlAUjjLoviayrX29S4a4uvb26L46gSJ/zHgSDU7GUASeMCi+PJKnsAyr3YB84fg2t4Da7IofjhB4n8V2F3NTmMAySCXOqxKZ5oD7FrFK1tgUbxDYoR/RNM4um0xMFaNThlAUrjF5nSsqM6pbE71LstuSZT4W5un0W3vSPwygIRhVftMtUXZx6t0pvMsyh6dnJQ/vQuWe1VtTQaQPCY031/lMz5UWe2nDrMoe0ly7vxNB4PPV0OTASTz/n/DU9X9eIQxt3LHtm2sveOO5Ig/fSxm96qVyQCSyvIhkEUlxgHeZnTD+taeTcx78x4G/4b5b9XEZABJZr2qZxztnc+V+ZBPWxRPtv9a/F6CxH8hcJWalwwg6QzV49N5ZTrObIviRL167GFwDfBtNS0ZwLDAW9NDsc5cOcYBLrEoPiJh4v81cJpalQxgGEXOD6i+Uhjs+/cnWhSflyjxtwUZ4Hg1KBnAMEsBqj8f3TLx6/S8clwCuX0tim9I2J3/fpwWNSYZwHBk1hCdt5QsYHOLlvwxYeJ/GDhQzUgGMHyTgJ4FKaqcBgxoHGA5DT7OovjlhMVtPvAJtaChRy8DDY4Lgeqm1as9otGK2fNli+LNE2iafwU+rqajDKAW2MTDoKpfwbE7OpcBb/ez1yMJFf/zEr8MoNb47hCcMyqw7TaLsnslUPwLga3UXGQAtcYhPmvyuOqqiTl5xgeutCg+KoHifxV9n08GULM0NlR33b6Vb/X1JOBMa49PT6D4XwOmqZHIAGqZqgrP7u7uBtYe2T/WoviKBIr/DeBjah4ygJrH29KnVvmUH2YBB1oU35xQ8W+kliEDqBMH8Cqv3msZYF+L4gclfiEDGHoCD4P9qib/KPuARfEfJX4hA0gO36vrJKhntF/ilwHULXv7Yc3NdSr+hWi0XwZQ9zTkvleH4n8BPeeXAQgAvlhn4v8bsKWqXQYgPhRFW/CtOhH/M8A2qnEZgOilDC6oA/HPB3ZQZcsAxLqM8DA4pobF/wiwi6pZBiDy84MaFf/vgRmqXhmAKMw0D4M9a0v86XnA/qpaGYAoCrushu78s8EPUZ3KAETxstnHD2/eqAbE/2ugTfUpAxADJeeXDXPx/xSt2y8DECVL6HN++JRRw7LkbcFlwKmqQxmAGJSSui8dfnf+pu/gnKnKkwGIQaupuisGlSHtPx3s/6jiZAC1hA2xqM4bFuJvC04GfihpyABqja4hPv93Ey/+MDgK5xeSRanfX5QBJLh127sJENjXEhue1vQhwC3SPuC8JwOouQ5A7q0ElOLyhKb9e2E+T8r/Z2N5SwZQeyxKQBlGexicmKw7f7Azzp8k+rVV4YtkADV3pY0vJaQkVyWnz9+0JcaTUvxHWJ2YtiIDKFtSN3vxPxJSlPHeFhw39OIPpoK9ILX30VbueHOFDKA2+Xsybr1cO8R3/okJ6RIlkb/WVW+nzio3KX3dCR4GXxgS8X+maTRYp3Se+DYiA6jAnfeBBJXmJ1W//DN3MUZaDDRK53nbyP0ygJrt3HkmQaUZ42Hw1aqe8cVFWWCcVF6AkamMDKBW9R91Lk9Y37dqYwEeBq8ATVJ4QRbarR0rZQC1zfWJyjjD4IIqnGMBsIn03S831NsF158B2NCOwPfB+f7JqY0VFP9jwPbSdjHBSv1YBlDr+m+PF5GUx4EfMr7rNxUS/33A7lJ2UfzVMh2xDKA+bOCihBXoaA/T25RZ/LOBg6TrormoLpVQt9leGHQBDQkq0usWxdPKc23p68FPkKaLZpVF8ah6vPA6XhHIzk5YgT7mYXDm4MUfXC3xD5iz6lYF9VzrCcwCwD1tmc64xOu5GPh36Vl3f2UAxXFi4kpktqA08TedLfGXxBfq+eKt3mvfw+DvwNYJK9ZTFsXTi76G1uA/sPocxBokz1kUby8DqGsDSE8BfzOBRVvIiBE72q2L3s9b9v0nNjBx5D3AgdJyCXR3Ndvct7P1HIK6Xxbcouxi4JwEFm1zVq9+z8Pgcm/dcLNewj88Pd3D4MdMHNkl8Zdc82fVu/iVAfTuCjyGJs3UC49ZFO+pMMgAPmoCK4DRikRNs8KieIzCoC7AujSmNlMQat3lU5srCDKAvtOh2zo6gF0ViZqt4V0s09GhOMgA8jeRKH4CY19FouY6u/tZlH1SgdAYQLHjAXsAjyoStVCZzLBMrLqUAQyw3bSlN8N9oSIxnCsxt4VllqgO1QUowR3bsy8zctQI4EVFY9jxMiN8lMSvDKBcXYIrga8rEsOCn1gUf1VhkAGU1wRa0ruS8v8G1lc0EskK8E9a1Kn+vgygotmAXrtNHj+wKD5HYZABVCsbGE3Kf0adv06agCb8O7q6T7E7lryrWMgAqm8ErVPGYt3f0/hA1fkZbudYJrtMoZABJMMM2oJjcU4D9lY0KsLjwDUWxb9SKGQASR8n+CzQCswENlRESuId4G7IReRG3GxzFncrJDKAYdpVaJoBqZ0w35qer/SkwSaAjwa8jkOzGvgHEAOvA89jPMOqrkftzrdXquUIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBC5KNmpwJ7S3oiKc+tc72W6rb2Dr06Kv63rXx66ijGdk+02dm6+1RYY81eWcqX9l3buYXAFmr2wls3nIql7oeubcmBhwHAv1oU/6xeYlCPi4IuV9MXfugGY7HUImDbj2z6qYfB6TIAIWqZESP+X4GtP5QBCFHbfKpghtAW7CEDEKJ26SrcR8itrocgNKodiKr0udvSu+OMpPfiJ4bjlsk+PARFug34Rr6NFi15QgYgRNkcwO8FJqyrNOsxgipjUXyGh8GXgHF9bJ2lMQAhysu7JaXilTWB8Tg3rpWVPAm+h0XZO+ulUpQBiLrGMvEJwAn1ev3KAISoY2QAQsgAhBAyACGqjysEQ8eQDwJ6S9NGpOwQYBfgY/R8ejsHvA28hPtfWNZwh/2hIzETM7wlPYUGPwRnOj0f+Ri3VplfBB5lvVV32M3LchUrQ1twCM4+wNbApDVCWgL8DXjIovjBXvv3fKmohZ4PcazNejjnWiZ+rf9zNu2N2+HAdGAq2Ig8Ah6LcaK1Z+8r4kpGeBg83UdbbABesig+tJ8y7YnbITjbYUwm/yPFcRbFM/75u9bmZiz3d3q+PrQ2o+j5/NiF65wrDC4BmtfUda+yWhSf1Gvf1uZNsNzMtdr1KGAF2Gvg82mwO+327OK6NQAPgzOBc+nvs1lmsEEOD4P54N+xqHPu0JW56Syws8Gb+r1vrRiJh8GjwHcsiu8uj+ibpuN2CTCzv/OvebPtNtzOtUz2RbA9wfN9yfgyIK8BeGswHeN+nEnF37xt/QFc2o55jtGY//rSIfhNOOv17DrAYHbTQCPjgfF9bJ2U51fHAdPybDtpTdzPBs6B3KSCCU+342GwGOcSy8RX140BeFu6FfeohJ/uCjbHw2Ah5vtYe+fiKprV54CbSvjpnsA8D4OXwPe3qHNRSeefNWUcjd134QP+6OiRmB/pYfA78M4C++UKCO1g8HuHKLXvzmNIF4J/u4Jdj3zxWJVvfw+DEGgfYBmmYFzlYXAlztGWiW+t6TEAD4Oflyj+tdkctzc9DA6pUplvL1H8a7MF2BveGhw18POnD6Wx+x0G98Xho4HTBnzuYyY3lCj+ytVHa7AXxrdJFqkSxN8r1cG4xcNgbs0agLcGtwCnlPGQ8zwMPllh8T8MHF62A/ZU8ucHcP7TwO8Ysmb9QcMFiRu1Mmp5sY5ZPdlijRmAh8HZGEdV4NAPeGvzhAqV+RfAJypw6Bs9bN6hyG7HNUPcII8f2u6l95qn74dPHQ18nNpmcw+DZ2tmDMDDpinA9/vZbSlwEfhd0PAKlmqA7m1wPwY4u/AdIXc/8C/lLXN6X/CT+9ntCbBryflDjMi9DiNzeFczOWYAXwH2L9DFfIQ+X0L5MFtKTwMvttuxBOxF8BQ9TwQmljEUmxbYdplF8TfLcI7VFsUji9oz17VvP3t8jYbu37Bs3Aoac72HBc2Hcv3LBcAyYDLrrkDUF9t5mL7OouyXh70BgP1XPzvka0jzgfn+yYnnMn7kC+Rfx283b0vPsPbsn8toAf3051L7WNTxpz42vLLm72ZvCXYlxeN5DrC+twanWyb+Ud8h82Jej/0WIxp/ZLe++UHvu+TkCeQazwL/j0Ead6FR/FfLJH4+fB2wyFJtUmC4/0cWxT/u+c+3knAn/xPGN609fqSPG8xB4FcAOxW41i95mL7WomxFX0uuaBfAW4KNgUKu/b3+GpI9uMwtircE3s9/Ir+4jKl/C/kfA0EqNymP+HuXe048H0ttUaAv+9082cfxwEYFDv1ni2KzKL70o+IHsNlv/cOi7LdJjRoBPFd6y2gYXagMQySqsQW2/SFBaXyrRfE+fYkfwKLs/RbFO2P2xX5a423DewwgxRkFtr5iUfzvxSuTzxbYepBfWbZ3ys/ML1o/ymYvWVr0va29YyFwbZ7NY7y1afc+LvTyQmMeFsVFjUvY7Ne7LIq3B54s1QsLJeMJ7Dsno0ypho9bFM8prn1kf4UX6iqymYfBjOFrAHBswf7aQBLFTHwncClwcc94Qa+//8uD6U3LVOZ8FbLU2jsH7sjdfkmB7PeIj9z9twfSefZeblF80IAT7CjehfJPt63Z70kMki/Z7MXPDrBd/wE4v8AeZwzLMQA/kBQ90ybzNcy7SmjM36polyVsmlGgyV9bklLmdr7hYbAaGNHH5n1675w7jnxjVV7QTPvjy8DPpc+K8oZF8S9KaiNRfJGHwbnAmD4q/rPD0gCYEOxWICn7QyKr0G23vPc2Z3cPgyvpmaM+EFbSsxrOBn1s2+4j5883r2G1ZeKS5wNYFP/Cw0AGUNG2w2DnTFwKXNjnoduap1p7x5vDywC62bRAovh0IivR2KzA1k+v+Ssnkz/y//nmB9xehnP9HjhASq0QDdY+yMY3G/zCvkc3fEegIgZQuTEAs0kFtib1G2yThvj84/P8+4IyHPuvUmkF7x2zs0sGdYD1LP/YQSrXXKlyV9AAvNCxuxJaj0ldH+GDMhxjhWSaYAO5uaPAUwxrHIYN3gt9gXdCQushqV8N3ighxxCVUkvLlAKvxfs7lTpv5cYAcraowBjA5gmth9cLbDsDcg+tWQSjTLW+zuulL9H3jMdy9N0PlMwqKODWYC/LxKV/4CTVvV+BjS8NPwNwni5gAHsnsxZ5Jn+ZbZVFS/6nwiV4NI8B7Oxtk9e39rdKylA8DDajwCNZUY4cnq8Ag/nC0VfzHro9O3/YdQFsTryE/BNQNvJw8vgBN+RZwRg/bOLYPv7W91nNI8tQ6gcLnP2zVWhG+WeQecNPBnHc66TQivMFb5k8rsTsYVPg4Dybn6tkoSs96FXg8VXDgF5W8cOCDWjkPRpGvtvH33Iac9MGLf9MdgU9L/P0xf7e1lzRpwQWxTcX2Hy8h00D7gp4W/A54CDpswqkGh4rMXv4c4Gs9OfD2ACs0Oy5b3rb1OIHAxv4ZYGtb1kUv1h0ol+Y/O/ge+6BAYlvZvNoD4NXPAye8zB49iN/b3hb0Me7ANxYKEPx1mDP4lP/9GfwQa9mVPmOV+2wrYfBgwPsnj1F/unfWCa+YtgagEXZB+hZKTfP1Xct9P02SxURpJOBsMAulw+gWOv3cxcudKydPQyKn8I8KvckPasGb0vPrL+1/5qtPf7LOr/JNZzW393C24LLiojZdeBJ+sZdd56SjqC2OMDDoMPDYHo/5ryfh8FyCr4SzKWVLmzl1wNw/wJm+aaxTmKD97q9LTjJ2uPr1/np0VPHsLLrGuCL/Yi2rxduPgD6eqV1Sz+yqclu6yy0SOY55F/EZKaHwTKcL+VbxNFb0y2Y30jhx52n9z12sni5h8H55JkWuuaeeeaaVZV/C3YPsBB3I8WWOIcCRyZQGFnyrKjrYfB1i+KrasgE0sATHgYvADfg/jiklmE+GWNPnJPAN+7nGO9V+t2XqhiAZTrv9DB4gEKPoZxfeRj8CngKeAMYCWzLyq6PFXGKfKOnTwJ9v9zTZbGHwbw1jdKAsYxcfbzdsnTlGkP5gYfBVyDv1OAJa9b3A3iGnseHDfQ8a9+hiKx2qUXxNQUM7SIPgyOBnfs5znHgx63JDJKeTD8B7J5n25VrltNesNZVpIDXLYpPGcZGsBVwUc+aJz6wDk+3Ta9GAauyLLhF8UEeBm/T9wsxvVLsIhr92vzJojjf6Hh7XgNYcyfvHXA/kZ4Xd9ak4iu3IzVqBf2/+rojede1z5sV7V5EzKZ7GGSBoEbuircBpxbYvhHrTFayV6hL7FCbm32xGmeq3tTXFZ6mZ+2/cvGiRfE+ebc2xD8YzGCUzfnHStwnk38t+BLrNnWoZTqLmthhUZwGnq+JJh3F99CzLt5AWF132nc+ZVH2rmqdrmoGYPd0rrYonoRzfxkON9eieKuC57sdB04cZPdlqUXxKHxQEzzWPuJe1t5x1wCFsw1Qji/H/G3oXaBhnxqVbTfw6iCPsYhun2qZ+L5qFrzqL79YJj4Y5zOU9kZgjPtMi+KWIsVzQz9pZ7Fl3hvnMKCjxEP8smcdv+wjJd49v46nNgf+WMLP72Tl+2PBfjfk+m9fvKCY7s8wpMGieFPgrBJGYlZi9hWL4o1tbmfVvxU4JG+/WSaeZ1HcjOdm0DNLrdC7zq8CP8NzMyyK05bpvHuA4rmOXPd44Cqgs9RYWCa+w6J4Cti/0LPOX6H+6QfAfcDXmPZ2g0XxyYOPWcfLFsX70p1K07MM2jMFdn8cOI8GJlgUz7J5777PumsP9DcWVGjhk7GDyKr+x6LY6PlS0aP97P7R2aKjCuw7sJmgVvD6xpRo1JdbFKfAwzVjHvmmbi8FbgKbaVE82tqzPx0yU05U96d1w8mkGsbTTY4GW2rtHe9U5jzpKaR8DLZm7XingfW2et5uesQHfqymCZhtAG6kUu/a7GxnVWPWMnUctnoypMCs06KO98p27M81pVjPesdklcOEidi1L5T1mYOHk8ewsmutVcIdRo5yi+J/vsbsx2zcyDvvjurjLmsEYz+w6xd1VzTWPY/1tswjfivwu6m4jcbsfYs6OpKkOS3uKESFDSDJpFStQtQvMgAhZABCCBmAEEIGIISQAQghZABCCBmAEEIGIISQAQghZABC1BUTFAIhhBBCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQgghRL/8fyqPSVy7lttOAAAAAElFTkSuQmCC" alt="Cleartrip" />
+          <div>
+            <div class="q-company-name">Cleartrip Pvt. Ltd.</div>
+            <div class="q-company-addr">Embassy Tech Village, Outer Ring Rd,<br>Devarabeesanahalli, Bellandur,<br>Bangalore, Karnataka, 560103</div>
+          </div>
+        </div>
+        <div class="q-header-right">
+          <div class="q-seller-name" id="qSellerName"></div>
+          <div class="q-seller-role">Destination Expert · Thailand</div>
+          <div class="q-phone" id="qSellerPhone"></div>
+          <div><i class="ti ti-mail"></i> holidaysupport2@cleartrip.com</div>
+        </div>
+      </div>
+
+      <div class="q-banner">
+        <div class="q-banner-top">
+          <div>
+            <div class="q-dest-tag"><i class="ti ti-map-pin"></i> <span id="qDestTag"></span></div>
+            <h2 id="qBannerTitle"></h2>
+            <div class="q-banner-sub" id="qBannerSub"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;">
+            <div class="q-price-pill">
+              <div class="price-label">Per Person</div>
+              <div class="price-val" id="qPerPaxBanner"></div>
+              <div class="price-sub">All Inclusive</div>
+            </div>
+            <div class="q-valid" id="qValidTill" style="background:rgba(255,255,255,0.12);color:#FFD4A8;border:0.5px solid rgba(255,255,255,0.25);margin-top:0;"></div>
+          </div>
+        </div>
+        <div class="q-banner-chips" id="qChips"></div>
+      </div>
+
+      <div class="q-body">
+        <div class="q-info-grid">
+          <div class="q-info-card">
+            <div class="q-info-card-title"><i class="ti ti-user-circle"></i> Guest Details</div>
+            <div class="q-info-row"><span class="k">Guest Name</span><span class="v" id="qGuestName"></span></div>
+            <div class="q-info-row"><span class="k">Departure From</span><span class="v" id="qDepCity"></span></div>
+            <div class="q-info-row"><span class="k">Travel Month</span><span class="v" id="qMonth"></span></div>
+          </div>
+          <div class="q-info-card">
+            <div class="q-info-card-title"><i class="ti ti-users"></i> Passenger Summary</div>
+            <div class="q-info-row" id="qPaxAdults" style="display:none"><span class="k">Adults</span><span class="v"></span></div>
+            <div class="q-info-row" id="qPaxChildren" style="display:none"><span class="k">Children</span><span class="v"></span></div>
+            <div class="q-info-row" id="qPaxInfants" style="display:none"><span class="k">Infants</span><span class="v"></span></div>
+            <div class="q-info-row"><span class="k">Total Pax</span><span class="v" id="qTotalPax"></span></div>
+          </div>
+        </div>
+
+        <div class="q-flight-card">
+          <div class="q-flight-title"><i class="ti ti-plane"></i> Return Flights</div>
+          <div class="q-flight-rows" id="qFlightRows"></div>
+        </div>
+
+        <div class="q-incl">
+          <div class="q-incl-title"><i class="ti ti-circle-check"></i> Package Inclusions</div>
+          <div class="q-incl-list">
+            <div class="q-incl-item"><i class="ti ti-plane"></i> Return Airfare</div>
+            <div class="q-incl-item"><i class="ti ti-bed"></i> Hotel Accommodation (BB)</div>
+            <div class="q-incl-item"><i class="ti ti-ticket"></i> All Sightseeing Tickets</div>
+            <div class="q-incl-item"><i class="ti ti-car"></i> All Transfers</div>
+            <div class="q-incl-item"><i class="ti ti-sailboat"></i> Island Tours &amp; Cruises</div>
+            <div class="q-incl-item"><i class="ti ti-device-sim"></i> Free SIM Card</div>
+            <div class="q-incl-item"><i class="ti ti-shield-check"></i> Free Travel Insurance</div>
+          </div>
+        </div>
+
+        <div class="q-section-head"><div class="line"></div><span><i class="ti ti-map-2"></i> Day-wise Itinerary</span><div class="line"></div></div>
+        <div class="itinerary-list" id="qItinerary"></div>
+
+        <div class="q-section-head" style="margin-top:12px;"><div class="line"></div><span><i class="ti ti-building"></i> Accommodation</span><div class="line"></div></div>
+        <div id="qHotels" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px;"></div>
+
+        <div class="q-price-footer">
+          <div class="q-pf-left">
+            <strong>Total Package Price</strong>
+            Airfare + Hotels + Sightseeing + Transfers<br>
+            Free SIM &amp; Travel Insurance included<br>
+            <span style="font-size:11px;color:rgba(255,255,255,0.4);">Infants charged flight fare only · No hidden charges</span>
+          </div>
+          <div class="q-pf-right">
+            <div class="q-pf-pax" id="qPricePerPaxNote"></div>
+            <div class="q-pf-amount" id="qTotalPrice"></div>
+            <div class="q-pf-note">For <span id="qTotalPaxNote"></span> passenger(s)</div>
+          </div>
+        </div>
+
+        <div class="q-notes">
+          <div class="q-notes-title"><i class="ti ti-info-circle"></i> Important Notes</div>
+          <div class="q-notes-list">
+            <div class="q-notes-item">Quote valid for 24 hours. Rates &amp; availability subject to confirmation at time of booking.</div>
+            <div class="q-notes-item">Prices inclusive of 2% TCS and GST. Valid for Indian passport holders only.</div>
+            <div class="q-notes-item">Rooms and prices subject to availability and reconfirmed at time of booking.</div>
+            <div class="q-notes-item">SIC transfers not possible from outskirt hotels. DMK airport transfers attract surcharge.</div>
+            <div class="q-notes-item">100 THB surcharge per trip for pickups between 11 PM – 6 AM.</div>
+          </div>
+        </div>
+
+        <div class="q-footer-website">
+          <a href="https://www.cleartrip.com/holidays/" target="_blank">https://www.cleartrip.com/holidays/</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ADMIN SCREEN -->
+<div id="screenAdmin" class="screen">
+  <div class="admin-container">
+    <div class="admin-header">
+      <h1>Rate <span>Editor</span></h1>
+      <div style="display:flex;gap:10px;">
+        <button class="admin-save-btn" onclick="saveAdminRates()"><i class="ti ti-device-floppy"></i> Save All Changes</button>
+        <button class="admin-logout-btn" onclick="adminLogout()"><i class="ti ti-lock"></i> Lock</button>
+      </div>
+    </div>
+
+    <!-- FLIGHT FARES -->
+    <div class="admin-section">
+      <div class="admin-section-head"><i class="ti ti-plane"></i> Flight Fares (₹ per person)</div>
+      <div class="admin-section-body">
+        <table class="admin-table" id="adminFlightTable">
+          <thead>
+            <tr>
+              <th>City</th>
+              <th>Bangkok · May</th><th>Bangkok · Jun</th><th>Bangkok · Jul</th><th>Bangkok · Aug</th>
+              <th>Phuket · May</th><th>Phuket · Jun</th><th>Phuket · Jul</th><th>Phuket · Aug</th>
+            </tr>
+          </thead>
+          <tbody id="adminFlightBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INFANT FLIGHT FARE -->
+    <div class="admin-section">
+      <div class="admin-section-head"><i class="ti ti-baby-carriage"></i> Infant Flat Flight Fare</div>
+      <div class="admin-section-body">
+        <div class="admin-field" style="max-width:200px;">
+          <label>Flat fare per infant (₹)</label>
+          <input type="number" class="admin-input" id="adminInfantFare" />
+        </div>
+      </div>
+    </div>
+
+    <!-- HOTELS -->
+    <div class="admin-section">
+      <div class="admin-section-head"><i class="ti ti-building"></i> Hotel Rates</div>
+      <div class="admin-section-body">
+        <table class="admin-table">
+          <thead><tr><th>City</th><th>Hotel Name</th><th>Room Type</th><th>Per Night (₹ for 2 pax)</th><th>Stars</th></tr></thead>
+          <tbody id="adminHotelBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ITINERARY COSTS — Bangkok-Pattaya -->
+    <div class="admin-section">
+      <div class="admin-section-head"><i class="ti ti-ticket"></i> Itinerary Costs · Bangkok – Pattaya</div>
+      <div class="admin-section-body">
+        <table class="admin-table">
+          <thead><tr><th>Duration</th><th>Base Cost (2 pax) ₹</th><th>Child Cost ₹</th><th>BKK Nights</th><th>Pattaya Nights</th></tr></thead>
+          <tbody id="adminItinBKKBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ITINERARY COSTS — Phuket-Krabi -->
+    <div class="admin-section">
+      <div class="admin-section-head"><i class="ti ti-ticket"></i> Itinerary Costs · Phuket – Krabi</div>
+      <div class="admin-section-body">
+        <table class="admin-table">
+          <thead><tr><th>Duration</th><th>Base Cost (2 pax) ₹</th><th>Child Cost ₹</th><th>Phuket Nights</th><th>Krabi Nights</th></tr></thead>
+          <tbody id="adminItinPHKBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:8px;">
+      <button class="admin-save-btn" onclick="saveAdminRates()" style="margin:0 auto;"><i class="ti ti-device-floppy"></i> Save All Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-circle-check"></i> <span id="toastMsg">Copied!</span></div>
+
+<script type="module">
+// ═══════════════════════════════════════════
+// FIREBASE SETUP
+// ═══════════════════════════════════════════
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBtZkxYkCkqgUZf54kPRLukdW-YHEEH2vs",
+  authDomain: "cleartrip-thailand-quote.firebaseapp.com",
+  projectId: "cleartrip-thailand-quote",
+  storageBucket: "cleartrip-thailand-quote.firebasestorage.app",
+  messagingSenderId: "86770275687",
+  appId: "1:86770275687:web:b7e6f54745105a25798bc2",
+  measurementId: "G-XKMQFDVMMS"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+const RATES_DOC = doc(db, 'config', 'rates');
+
+// ── Firebase: load rates + listen for real-time updates ──────────────────
+async function initRates() {
+  showLoadingBanner(true);
+  try {
+    const snap = await getDoc(RATES_DOC);
+    if (snap.exists()) {
+      mergeFirebaseRates(snap.data());
+    } else {
+      // First run — push defaults to Firebase
+      await pushRatesToFirebase();
+    }
+    // Real-time listener — all sellers get instant updates
+    onSnapshot(RATES_DOC, (snap) => {
+      if (snap.exists()) mergeFirebaseRates(snap.data());
+    });
+  } catch(e) {
+    console.warn('Firebase load failed, using defaults:', e);
+  }
+  showLoadingBanner(false);
+}
+
+function mergeFirebaseRates(data) {
+  try {
+    if (data.flights) {
+      ['Delhi','Mumbai','Bangalore','Ahmedabad'].forEach(city => {
+        ['Phuket','Bangkok'].forEach(dest => {
+          ['May','June','July','August'].forEach(month => {
+            if (data.flights[city]?.[dest]?.[month] !== undefined)
+              RATES.flights[city][dest][month] = data.flights[city][dest][month];
+          });
+        });
+      });
+    }
+    if (data.infantFlight !== undefined) RATES.infantFlight = data.infantFlight;
+    if (data.hotels) {
+      ['Bangkok','Pattaya','Phuket','Krabi'].forEach(city => {
+        if (data.hotels[city]) {
+          if (data.hotels[city].name)     RATES.hotels[city].name     = data.hotels[city].name;
+          if (data.hotels[city].perNight) RATES.hotels[city].perNight = data.hotels[city].perNight;
+        }
+      });
+    }
+    if (data.itineraries) {
+      ['Bangkok - Pattaya','Phuket - Krabi'].forEach(circuit => {
+        [4,5,6].forEach(n => {
+          const key = String(n);
+          if (data.itineraries[circuit]?.[key]) {
+            if (data.itineraries[circuit][key].cost2pax  !== undefined)
+              RATES.itineraries[circuit][n].cost2pax  = data.itineraries[circuit][key].cost2pax;
+            if (data.itineraries[circuit][key].childCost !== undefined)
+              RATES.itineraries[circuit][n].childCost = data.itineraries[circuit][key].childCost;
+          }
+        });
+      });
+    }
+  } catch(e) { console.warn('mergeFirebaseRates error:', e); }
+}
+
+async function pushRatesToFirebase() {
+  const payload = {
+    flights: RATES.flights,
+    infantFlight: RATES.infantFlight,
+    hotels: {
+      Bangkok: { name: RATES.hotels.Bangkok.name, perNight: RATES.hotels.Bangkok.perNight },
+      Pattaya: { name: RATES.hotels.Pattaya.name, perNight: RATES.hotels.Pattaya.perNight },
+      Phuket:  { name: RATES.hotels.Phuket.name,  perNight: RATES.hotels.Phuket.perNight  },
+      Krabi:   { name: RATES.hotels.Krabi.name,   perNight: RATES.hotels.Krabi.perNight   }
+    },
+    itineraries: {
+      'Bangkok - Pattaya': {
+        '4': { cost2pax: RATES.itineraries['Bangkok - Pattaya'][4].cost2pax, childCost: RATES.itineraries['Bangkok - Pattaya'][4].childCost },
+        '5': { cost2pax: RATES.itineraries['Bangkok - Pattaya'][5].cost2pax, childCost: RATES.itineraries['Bangkok - Pattaya'][5].childCost },
+        '6': { cost2pax: RATES.itineraries['Bangkok - Pattaya'][6].cost2pax, childCost: RATES.itineraries['Bangkok - Pattaya'][6].childCost }
+      },
+      'Phuket - Krabi': {
+        '4': { cost2pax: RATES.itineraries['Phuket - Krabi'][4].cost2pax, childCost: RATES.itineraries['Phuket - Krabi'][4].childCost },
+        '5': { cost2pax: RATES.itineraries['Phuket - Krabi'][5].cost2pax, childCost: RATES.itineraries['Phuket - Krabi'][5].childCost },
+        '6': { cost2pax: RATES.itineraries['Phuket - Krabi'][6].cost2pax, childCost: RATES.itineraries['Phuket - Krabi'][6].childCost }
+      }
+    }
+  };
+  await setDoc(RATES_DOC, payload);
+}
+
+function showLoadingBanner(show) {
+  document.getElementById('loadingBanner').style.display = show ? 'flex' : 'none';
+}
+
+// ── Override saveRates to push to Firebase ───────────────────────────────
+async // saveRates defined above (Firebase version)
+
+// Make saveRates global
+window.saveRates = saveRates;
+
+const SELLERS = {
+  'Vinay Kumar':      { phone: '918796331382' },
+  'Savita Joshi':     { phone: '918796331388' },
+  'Amit Kumar':       { phone: '918130043598' },
+  'Saurabh Pauriyal': { phone: '919319294064' }
+};
+
+const AIRPORT_CODES = {
+  Delhi:     { code:'DEL', name:'Indira Gandhi Intl Airport' },
+  Mumbai:    { code:'BOM', name:'Chhatrapati Shivaji Maharaj Intl Airport' },
+  Bangalore: { code:'BLR', name:'Kempegowda Intl Airport' },
+  Ahmedabad: { code:'AMD', name:'Sardar Vallabhbhai Patel Intl Airport' },
+  Bangkok:   { code:'BKK', name:'Suvarnabhumi Airport' },
+  Phuket:    { code:'HKT', name:'Phuket International Airport' }
+};
+
+const RATES = {
+  flights: {
+    Delhi:     { Phuket:{May:29000,June:30000,July:30000,August:28000}, Bangkok:{May:30000,June:31000,July:31000,August:29000} },
+    Mumbai:    { Phuket:{May:25000,June:26000,July:26000,August:24000}, Bangkok:{May:28000,June:29000,July:29000,August:27000} },
+    Bangalore: { Phuket:{May:34000,June:35000,July:35000,August:33000}, Bangkok:{May:32000,June:33000,July:33000,August:31000} },
+    Ahmedabad: { Phuket:{May:29000,June:30000,July:30000,August:28000}, Bangkok:{May:30000,June:31000,July:31000,August:29000} }
+  },
+  infantFlight: 10000,
+  hotels: {
+    Bangkok: { name:'The Ecotel Hotel', room:'Superior Room', meal:'Breakfast Only', perNight:4000, stars:3 },
+    Pattaya: { name:'Mind Resort',      room:'Superior Room', meal:'Breakfast Only', perNight:5000, stars:3 },
+    Phuket:  { name:'The Aim Patong',   room:'Deluxe Room',   meal:'Breakfast Only', perNight:6000, stars:4 },
+    Krabi:   { name:'Glow Aonang',      room:'Superior Room', meal:'Breakfast Only', perNight:7000, stars:4 }
+  },
+  itineraries: {
+    'Bangkok - Pattaya': {
+      4: { cost2pax:10000, childCost:10000, bkknights:2, ptynights:2, days:[
+        'Arrival at Bangkok Airport → Transfer to Pattaya Hotel → Alcazar Show (Normal Seat) — Ticket & Private Transfer',
+        'Coral Island Tour with Lunch by Speed Boat (From Pattaya) — SIC Transfer',
+        'Inter-hotel Transfer (Pattaya → Bangkok)',
+        'Bangkok City Temple Tour (Marble & Golden Buddha, Gems Gallery) — SIC Transfer',
+        'Departure → Transfer to Bangkok Airport'
+      ]},
+      5: { cost2pax:15000, childCost:15000, bkknights:2, ptynights:3, days:[
+        'Arrival at Bangkok Airport → Transfer to Pattaya Hotel → Alcazar Show (Normal Seat) — Ticket & Private Transfer',
+        'Coral Island Tour with Lunch by Speed Boat (From Pattaya) — SIC Transfer',
+        'Inter-hotel Transfer (Pattaya → Bangkok)',
+        'Bangkok City Temple Tour (Marble & Golden Buddha, Gems Gallery) — SIC Transfer',
+        'Princess Chao Phraya Dinner Cruise (Indian) — Ticket & SIC Transfer',
+        'Departure → Transfer to Bangkok Airport'
+      ]},
+      6: { cost2pax:20000, childCost:20000, bkknights:3, ptynights:3, days:[
+        'Arrival at Bangkok Airport → Transfer to Pattaya Hotel → Alcazar Show (Normal Seat) — Ticket & Private Transfer',
+        'Coral Island Tour with Lunch by Speed Boat (From Pattaya) — SIC Transfer',
+        'Dolphinarium (Regular Seat, Closed on Wed) — Private Transfer',
+        'Inter-hotel Transfer (Pattaya → Bangkok)',
+        'Bangkok City Temple Tour (Marble & Golden Buddha, Gems Gallery) — SIC Transfer',
+        'Princess Chao Phraya Dinner Cruise (Indian) — Ticket & SIC Transfer',
+        'Departure → Transfer to Bangkok Airport'
+      ]}
+    },
+    'Phuket - Krabi': {
+      4: { cost2pax:10000, childCost:10000, phuketnights:2, krabinights:2, days:[
+        'Arrival → Transfer to Phuket Hotel',
+        'Phi Phi Island Tour with Lunch by Speed Boat (Shared, Excl. National Park Fee) — SIC Transfer',
+        'Inter-hotel Transfer (Phuket → Krabi)',
+        'Krabi 4 Island Tour with Lunch by Long Tail Boat (Shared, Excl. National Park Fee) — SIC Transfer',
+        'Departure → Transfer to Phuket Airport'
+      ]},
+      5: { cost2pax:15000, childCost:15000, phuketnights:3, krabinights:2, days:[
+        'Arrival → Transfer to Phuket Hotel',
+        'Phi Phi Island Tour with Lunch by Speed Boat (Shared, Excl. National Park Fee) — SIC Transfer',
+        'Phuket City Tour (Chalong Temple, Karon View Point, Cashew Nut Factory, Old Town) — SIC Transfer',
+        'Inter-hotel Transfer (Phuket → Krabi)',
+        'Krabi 4 Island Tour with Lunch by Long Tail Boat (Shared, Excl. National Park Fee) — SIC Transfer',
+        'Departure → Transfer to Phuket Airport'
+      ]},
+      6: { cost2pax:20000, childCost:20000, phuketnights:3, krabinights:3, days:[
+        'Arrival → Transfer to Phuket Hotel',
+        'Phi Phi Island Tour with Lunch by Speed Boat (Shared, Excl. National Park Fee) — SIC Transfer',
+        'Phuket City Tour (Chalong Temple, Karon View Point, Cashew Nut Factory, Old Town) — SIC Transfer',
+        'Inter-hotel Transfer (Phuket → Krabi)',
+        'Krabi 4 Island Tour with Lunch by Long Tail Boat (Shared, Excl. National Park Fee) — SIC Transfer',
+        'Krabi 7 Island Tour with BBQ Dinner by Long Tail Boat (Shared, Excl. National Park Fee) — SIC Transfer',
+        'Departure → Transfer to Phuket Airport'
+      ]}
+    }
+  }
+};
+
+const PAX = { adults:2, children:0, infants:0 };
+
+function changePax(type, delta) {
+  const n = PAX[type] + delta;
+  if (n < 0) return;
+  if (type === 'adults' && n < 1) return;
+  PAX[type] = n;
+  document.getElementById('val-' + type).textContent = n;
+  document.getElementById('btn-' + type + '-minus').disabled = (type === 'adults' ? n <= 1 : n <= 0);
+}
+
+function getValidTill() {
+  const d = new Date(); d.setDate(d.getDate() + 1);
+  return d.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+}
+
+function fmtINR(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+function starsHTML(n) { return Array(n).fill('<i class="ti ti-star-filled"></i>').join(''); }
+
+function calcAll(circuit, nights, depCity, month, adults, children, infants) {
+  const itin = RATES.itineraries[circuit][nights];
+  const destKey = circuit === 'Phuket - Krabi' ? 'Phuket' : 'Bangkok';
+  const flightRate = RATES.flights[depCity][destKey][month];
+
+  const flightCost = (adults + children) * flightRate + infants * RATES.infantFlight;
+  const roomMult = Math.floor(adults / 2) + (adults % 2 === 1 ? 0.5 : 0);
+  let hotelCost = 0;
+  if (circuit === 'Bangkok - Pattaya') {
+    hotelCost += roomMult * RATES.hotels.Bangkok.perNight * itin.bkknights;
+    hotelCost += roomMult * RATES.hotels.Pattaya.perNight * itin.ptynights;
+  } else {
+    hotelCost += roomMult * RATES.hotels.Phuket.perNight * itin.phuketnights;
+    hotelCost += roomMult * RATES.hotels.Krabi.perNight * itin.krabinights;
+  }
+  let itinCost = itin.cost2pax + Math.max(0, adults - 2) * (itin.cost2pax / 2) + children * itin.childCost;
+  const total = flightCost + hotelCost + itinCost;
+  return { flightCost, hotelCost, itinCost, total };
+}
+
+function getDayType(t) {
+  const s = t.toLowerCase();
+  if (s.includes('arrival')) return 'arrival';
+  if (s.includes('departure')) return 'departure';
+  if (s.includes('inter-hotel') || s.includes('inter hotel')) return 'transfer';
+  return 'activity';
+}
+
+function flightRowHTML(fc, fCity, tc, tCity, lbl) {
+  return `<div class="q-flight-row">
+    <div class="q-flight-leg"><div class="q-flight-code">${fc}</div><div class="q-flight-city">${fCity}</div></div>
+    <div class="q-flight-mid"><div class="q-flight-arrow"><div class="q-flight-line"></div><i class="ti ti-plane q-flight-plane"></i><div class="q-flight-line"></div></div><div class="q-flight-label">${lbl}</div></div>
+    <div class="q-flight-leg"><div class="q-flight-code">${tc}</div><div class="q-flight-city">${tCity}</div></div>
+  </div>`;
+}
+
+function generateQuote() {
+  const depCity   = document.getElementById('depCity').value;
+  const month     = document.getElementById('travelMonth').value;
+  const circuit   = document.getElementById('circuit').value;
+  const nights    = parseInt(document.getElementById('nights').value);
+  const guestName = document.getElementById('guestName').value.trim();
+  const seller    = document.getElementById('seller').value;
+  const errEl     = document.getElementById('formError');
+
+  if (!depCity || !month || !circuit || !nights || !guestName || !seller) {
+    errEl.style.display = 'block';
+    errEl.textContent = 'Please fill in all fields before generating the quote.';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  const { adults, children, infants } = PAX;
+  const { flightCost, hotelCost, itinCost, total } = calcAll(circuit, nights, depCity, month, adults, children, infants);
+  const totalPax = adults + children + infants;
+  const perPax   = total / totalPax;
+  const itin     = RATES.itineraries[circuit][nights];
+  const destKey  = circuit === 'Phuket - Krabi' ? 'Phuket' : 'Bangkok';
+  const depAP    = AIRPORT_CODES[depCity];
+  const arrAP    = AIRPORT_CODES[destKey];
+  const sellerInfo = SELLERS[seller];
+
+  // Agent cost summary
+  document.getElementById('aFlights').textContent = fmtINR(flightCost);
+  document.getElementById('aFlightsSub').textContent = `${adults + children} pax × ₹${RATES.flights[depCity][destKey][month].toLocaleString('en-IN')}${infants > 0 ? ` + ${infants} infant(s)` : ''}`;
+  document.getElementById('aHotels').textContent = fmtINR(hotelCost);
+  document.getElementById('aHotelsSub').textContent = `${nights} nights · ${adults % 2 === 1 ? (Math.floor(adults/2) + 0.5) : adults/2} rooms`;
+  document.getElementById('aItin').textContent = fmtINR(itinCost);
+  document.getElementById('aItinSub').textContent = `Base + ${Math.max(0, adults-2)} extra adult(s) + ${children} child(ren)`;
+  document.getElementById('aTotal').textContent = fmtINR(total);
+  document.getElementById('aTotalSub').textContent = `${fmtINR(perPax)} per pax`;
+
+  // Header
+  document.getElementById('qValidTill').textContent = 'Valid till ' + getValidTill();
+
+// Init Firebase rates
+initRates();
+  document.getElementById('qSellerName').textContent = seller;
+  document.getElementById('qSellerPhone').innerHTML = `<i class="ti ti-phone"></i> ${sellerInfo.phone}`;
+
+  // Banner
+  document.getElementById('qDestTag').textContent = circuit;
+  document.getElementById('qBannerTitle').innerHTML = nights + ' Nights in <span>' + circuit.replace(' - ', ' &amp; ') + '</span>';
+  document.getElementById('qBannerSub').textContent = depCity + ' → Thailand → ' + depCity + ' · ' + month + ' 2026';
+  document.getElementById('qPerPaxBanner').textContent = fmtINR(perPax);
+
+  // Chips
+  document.getElementById('qChips').innerHTML = [
+    { icon:'ti-moon',         text: nights + ' Nights' },
+    { icon:'ti-plane',        text: 'Return Flights Included' },
+    { icon:'ti-device-sim',   text: 'Free SIM Card' },
+    { icon:'ti-shield-check', text: 'Free Insurance' }
+  ].map(c => `<div class="q-chip"><i class="ti ${c.icon}"></i>${c.text}</div>`).join('');
+
+  // Guest info
+  document.getElementById('qGuestName').textContent = guestName;
+  document.getElementById('qDepCity').textContent   = depCity;
+  document.getElementById('qMonth').textContent     = month + ' 2026';
+
+  // Pax rows
+  const pA = document.getElementById('qPaxAdults'), pC = document.getElementById('qPaxChildren'), pI = document.getElementById('qPaxInfants');
+  if (adults   > 0) { pA.style.display='flex'; pA.querySelector('.v').textContent = adults; }
+  if (children > 0) { pC.style.display='flex'; pC.querySelector('.v').textContent = children; }
+  if (infants  > 0) { pI.style.display='flex'; pI.querySelector('.v').textContent = infants + ' (flight only)'; }
+  document.getElementById('qTotalPax').textContent = totalPax + ' Pax';
+
+  // Flights
+  document.getElementById('qFlightRows').innerHTML =
+    flightRowHTML(depAP.code, depCity, arrAP.code, destKey, 'Outbound') +
+    flightRowHTML(arrAP.code, destKey, depAP.code, depCity, 'Return');
+
+  // Itinerary
+  document.getElementById('qItinerary').innerHTML = itin.days.map((day, i) => {
+    const dtype  = getDayType(day);
+    const isLast = i === itin.days.length - 1;
+    return `<div class="itin-card">
+      <div class="itin-timeline"><div class="itin-dot">${i+1}</div>${!isLast?'<div style="position:absolute;top:36px;left:50%;transform:translateX(-50%);width:2px;height:calc(100% - 4px);background:#FFD5B3;"></div>':''}</div>
+      <div class="itin-content"><div class="itin-day-label">Day ${i+1}</div><div class="itin-activity ${dtype}">${day}</div></div>
+    </div>`;
+  }).join('');
+
+  // Hotels
+  const hotels = circuit === 'Bangkok - Pattaya'
+    ? [{city:'Bangkok',nights:itin.bkknights,...RATES.hotels.Bangkok},{city:'Pattaya',nights:itin.ptynights,...RATES.hotels.Pattaya}]
+    : [{city:'Phuket',nights:itin.phuketnights,...RATES.hotels.Phuket},{city:'Krabi',nights:itin.krabinights,...RATES.hotels.Krabi}];
+  document.getElementById('qHotels').innerHTML = hotels.map(h => `
+    <div class="hotel-card">
+      <div class="hotel-card-head"><div class="hotel-icon-box"><i class="ti ti-building" style="color:var(--ct-orange);font-size:16px;"></i></div>
+      <div><div class="hotel-city">${h.city}</div><div class="hotel-nights-tag">${h.nights} Night${h.nights>1?'s':''}</div></div></div>
+      <div class="hotel-name">${h.name}</div>
+      <div class="hotel-meta">${h.room} · ${h.meal}</div>
+      <div class="hotel-stars">${starsHTML(h.stars)}</div>
+    </div>`).join('');
+
+  // Price footer
+  document.getElementById('qPricePerPaxNote').textContent = fmtINR(perPax) + ' per person';
+  document.getElementById('qTotalPrice').textContent      = fmtINR(total);
+  document.getElementById('qTotalPaxNote').textContent    = totalPax;
+
+  // Switch screens
+  document.getElementById('screenForm').classList.remove('active');
+  document.getElementById('screenQuote').classList.add('active');
+  window.scrollTo(0, 0);
+
+  window._quoteData = { guestName, circuit, nights, depCity, month, adults, children, infants, total, perPax, totalPax, itin, depAP, arrAP, destKey, seller, sellerInfo };
+}
+
+function goBack() {
+  document.getElementById('screenQuote').classList.remove('active');
+  document.getElementById('screenForm').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function copyWhatsApp() {
+  const d = window._quoteData; if (!d) return;
+  const paxParts = [];
+  if (d.adults)   paxParts.push(d.adults + ' Adult' + (d.adults > 1 ? 's' : ''));
+  if (d.children) paxParts.push(d.children + ' Child' + (d.children > 1 ? 'ren' : ''));
+  if (d.infants)  paxParts.push(d.infants + ' Infant' + (d.infants > 1 ? 's' : '') + ' (flight only)');
+  const days = d.itin.days.map((day, i) => `  📍 Day ${i+1}: ${day}`).join('\n');
+  const msg = `✈️ *CLEARTRIP HOLIDAY QUOTE*\n━━━━━━━━━━━━━━━━━━━━\n\n👤 *Dear ${d.guestName}*\n\nHere's your personalised Thailand holiday package! 🌴\n\n🗺️ *Destination:* ${d.circuit}\n🌙 *Duration:* ${d.nights} Nights\n🛫 *Flights:* ${d.depAP.code} (${d.depCity}) ↔ ${d.arrAP.code} (${d.destKey}) — Return\n📅 *Travel Month:* ${d.month} 2026\n👥 *Passengers:* ${paxParts.join(', ')}\n\n💰 *Package Price*\nPer Person: ₹${Math.round(d.perPax).toLocaleString('en-IN')}\nTotal (${d.totalPax} Pax): ₹${Math.round(d.total).toLocaleString('en-IN')}\n_Note: Infants charged flight fare only (₹10,000 flat)._\n\n✅ *What's Included*\n✈️ Return Airfare (${d.depAP.code} ↔ ${d.arrAP.code})\n🏨 Hotel Accommodation (Breakfast Included)\n🎟️ All Sightseeing Tickets & Transfers\n🌊 Island Tours & Cruises\n📱 Free SIM Card\n🛡️ Free Travel Insurance\n\n📋 *Day-wise Itinerary*\n${days}\n\n⚠️ *Important Notes*\n• Quote valid for 24 hours. Rates & availability subject to confirmation at time of booking.\n• Prices inclusive of 2% TCS and GST. Valid for Indian passport holders only.\n• Rooms and prices subject to availability and reconfirmed at time of booking.\n• SIC transfers not possible from outskirt hotels. DMK airport transfers attract surcharge.\n• 100 THB surcharge per trip for pickups between 11 PM – 6 AM.\n\n📌 *Quote validity:* ${getValidTill()}\n🌐 www.cleartrip.com/holidays/\n\n📞 ${d.sellerInfo.phone}\n👤 ${d.seller} | Destination Expert · Thailand\n\n_Cleartrip Pvt. Ltd. — Your Holiday, Simplified_ 🧡`;
+  navigator.clipboard.writeText(msg).then(() => showToast('Copied to clipboard!')).catch(() => {
+    const ta = document.createElement('textarea'); ta.value = msg;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); showToast('Copied to clipboard!');
+  });
+}
+
+function downloadPDF() {
+  showToast('Preparing PDF...');
+  setTimeout(() => window.print(), 400);
+}
+
+
+
+// ═══════════════════════════════════════════
+// ADMIN PANEL
+// ═══════════════════════════════════════════
+const ADMIN_PWD = 'Travclan@12';
+const STORAGE_KEY = 'ct_rates_v1';
+
+function openAdminLogin() {
+  document.getElementById('adminLoginOverlay').style.display = 'flex';
+  document.getElementById('adminPwdInput').value = '';
+  document.getElementById('adminPwdErr').style.display = 'none';
+  setTimeout(() => document.getElementById('adminPwdInput').focus(), 100);
+}
+function closeAdminLogin() {
+  document.getElementById('adminLoginOverlay').style.display = 'none';
+}
+function checkAdminPwd() {
+  const pwd = document.getElementById('adminPwdInput').value;
+  if (pwd === ADMIN_PWD) {
+    closeAdminLogin();
+    openAdminPanel();
+  } else {
+    document.getElementById('adminPwdErr').style.display = 'block';
+    document.getElementById('adminPwdInput').value = '';
+    document.getElementById('adminPwdInput').focus();
+  }
+}
+function adminLogout() {
+  document.getElementById('screenAdmin').classList.remove('active');
+  document.getElementById('screenForm').classList.add('active');
+  window.scrollTo(0, 0);
+}
+function openAdminPanel() {
+  ['screenForm','screenQuote'].forEach(id => document.getElementById(id).classList.remove('active'));
+  document.getElementById('screenAdmin').classList.add('active');
+  renderAdminPanel();
+  window.scrollTo(0, 0);
+}
+
+function renderAdminPanel() {
+  // Flight table
+  const cities = ['Delhi','Mumbai','Bangalore','Ahmedabad'];
+  const months = ['May','June','July','August'];
+  const dests  = ['Bangkok','Phuket'];
+  let flightHTML = '';
+  cities.forEach(city => {
+    flightHTML += `<tr><td class="row-label">${city}</td>`;
+    dests.forEach(dest => {
+      months.forEach(m => {
+        const val = RATES.flights[city][dest][m];
+        flightHTML += `<td><input type="number" class="admin-input" data-type="flight" data-city="${city}" data-dest="${dest}" data-month="${m}" value="${val}" /></td>`;
+      });
+    });
+    flightHTML += '</tr>';
+  });
+  document.getElementById('adminFlightBody').innerHTML = flightHTML;
+
+  // Infant fare
+  document.getElementById('adminInfantFare').value = RATES.infantFlight;
+
+  // Hotels
+  const hotelCities = ['Bangkok','Pattaya','Phuket','Krabi'];
+  let hotelHTML = '';
+  hotelCities.forEach(city => {
+    const h = RATES.hotels[city];
+    hotelHTML += `<tr>
+      <td class="row-label">${city}</td>
+      <td><input type="text" class="admin-input wide" data-type="hotelName" data-city="${city}" value="${h.name}" /></td>
+      <td><input type="text" class="admin-input" data-type="hotelRoom" data-city="${city}" value="${h.room}" /></td>
+      <td><input type="number" class="admin-input" data-type="hotelRate" data-city="${city}" value="${h.perNight}" /></td>
+      <td><input type="number" class="admin-input" style="width:60px;" data-type="hotelStars" data-city="${city}" value="${h.stars}" min="1" max="5" /></td>
+    </tr>`;
+  });
+  document.getElementById('adminHotelBody').innerHTML = hotelHTML;
+
+  // Itinerary BKK
+  const bkkNights = [4,5,6];
+  let bkkHTML = '';
+  bkkNights.forEach(n => {
+    const it = RATES.itineraries['Bangkok - Pattaya'][n];
+    bkkHTML += `<tr>
+      <td class="row-label">${n} Nights</td>
+      <td><input type="number" class="admin-input" data-type="itinCost" data-circuit="Bangkok - Pattaya" data-nights="${n}" data-field="cost2pax" value="${it.cost2pax}" /></td>
+      <td><input type="number" class="admin-input" data-type="itinCost" data-circuit="Bangkok - Pattaya" data-nights="${n}" data-field="childCost" value="${it.childCost}" /></td>
+      <td><input type="number" class="admin-input" style="width:70px;" data-type="itinCost" data-circuit="Bangkok - Pattaya" data-nights="${n}" data-field="bkknights" value="${it.bkknights}" /></td>
+      <td><input type="number" class="admin-input" style="width:70px;" data-type="itinCost" data-circuit="Bangkok - Pattaya" data-nights="${n}" data-field="ptynights" value="${it.ptynights}" /></td>
+    </tr>`;
+  });
+  document.getElementById('adminItinBKKBody').innerHTML = bkkHTML;
+
+  // Itinerary PHK
+  let phkHTML = '';
+  bkkNights.forEach(n => {
+    const it = RATES.itineraries['Phuket - Krabi'][n];
+    phkHTML += `<tr>
+      <td class="row-label">${n} Nights</td>
+      <td><input type="number" class="admin-input" data-type="itinCost" data-circuit="Phuket - Krabi" data-nights="${n}" data-field="cost2pax" value="${it.cost2pax}" /></td>
+      <td><input type="number" class="admin-input" data-type="itinCost" data-circuit="Phuket - Krabi" data-nights="${n}" data-field="childCost" value="${it.childCost}" /></td>
+      <td><input type="number" class="admin-input" style="width:70px;" data-type="itinCost" data-circuit="Phuket - Krabi" data-nights="${n}" data-field="phuketnights" value="${it.phuketnights}" /></td>
+      <td><input type="number" class="admin-input" style="width:70px;" data-type="itinCost" data-circuit="Phuket - Krabi" data-nights="${n}" data-field="krabinights" value="${it.krabinights}" /></td>
+    </tr>`;
+  });
+  document.getElementById('adminItinPHKBody').innerHTML = phkHTML;
+}
+
+function saveAdminRates() {
+  const inputs = document.querySelectorAll('#screenAdmin input');
+  inputs.forEach(inp => {
+    const t = inp.dataset.type;
+    if (t === 'flight') {
+      RATES.flights[inp.dataset.city][inp.dataset.dest][inp.dataset.month] = Number(inp.value);
+    } else if (t === 'hotelRate') {
+      RATES.hotels[inp.dataset.city].perNight = Number(inp.value);
+    } else if (t === 'hotelName') {
+      RATES.hotels[inp.dataset.city].name = inp.value;
+    } else if (t === 'hotelRoom') {
+      RATES.hotels[inp.dataset.city].room = inp.value;
+    } else if (t === 'hotelStars') {
+      RATES.hotels[inp.dataset.city].stars = Number(inp.value);
+    } else if (t === 'itinCost') {
+      RATES.itineraries[inp.dataset.circuit][inp.dataset.nights][inp.dataset.field] = Number(inp.value);
+    }
+  });
+  // Infant fare
+  RATES.infantFlight = Number(document.getElementById('adminInfantFare').value);
+
+  // Persist to localStorage
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    flights: RATES.flights,
+    infantFlight: RATES.infantFlight,
+    hotels: RATES.hotels,
+    itinCosts: {
+      'Bangkok - Pattaya': {
+        4: { cost2pax: RATES.itineraries['Bangkok - Pattaya'][4].cost2pax, childCost: RATES.itineraries['Bangkok - Pattaya'][4].childCost, bkknights: RATES.itineraries['Bangkok - Pattaya'][4].bkknights, ptynights: RATES.itineraries['Bangkok - Pattaya'][4].ptynights },
+        5: { cost2pax: RATES.itineraries['Bangkok - Pattaya'][5].cost2pax, childCost: RATES.itineraries['Bangkok - Pattaya'][5].childCost, bkknights: RATES.itineraries['Bangkok - Pattaya'][5].bkknights, ptynights: RATES.itineraries['Bangkok - Pattaya'][5].ptynights },
+        6: { cost2pax: RATES.itineraries['Bangkok - Pattaya'][6].cost2pax, childCost: RATES.itineraries['Bangkok - Pattaya'][6].childCost, bkknights: RATES.itineraries['Bangkok - Pattaya'][6].bkknights, ptynights: RATES.itineraries['Bangkok - Pattaya'][6].ptynights }
+      },
+      'Phuket - Krabi': {
+        4: { cost2pax: RATES.itineraries['Phuket - Krabi'][4].cost2pax, childCost: RATES.itineraries['Phuket - Krabi'][4].childCost, phuketnights: RATES.itineraries['Phuket - Krabi'][4].phuketnights, krabinights: RATES.itineraries['Phuket - Krabi'][4].krabinights },
+        5: { cost2pax: RATES.itineraries['Phuket - Krabi'][5].cost2pax, childCost: RATES.itineraries['Phuket - Krabi'][5].childCost, phuketnights: RATES.itineraries['Phuket - Krabi'][5].phuketnights, krabinights: RATES.itineraries['Phuket - Krabi'][5].krabinights },
+        6: { cost2pax: RATES.itineraries['Phuket - Krabi'][6].cost2pax, childCost: RATES.itineraries['Phuket - Krabi'][6].childCost, phuketnights: RATES.itineraries['Phuket - Krabi'][6].phuketnights, krabinights: RATES.itineraries['Phuket - Krabi'][6].krabinights }
+      }
+    }
+  }));
+
+  showToast('✅ All rates saved successfully!');
+}
+
+// Rates loaded from Firebase (see initRates)
+
+// Init
+document.getElementById('btn-adults-minus').disabled = true;
+document.getElementById('btn-children-minus').disabled = true;
+document.getElementById('btn-infants-minus').disabled = true;
+document.getElementById('qValidTill').textContent = 'Valid till ' + getValidTill();
+
+// ═══════════════════════════════════════════
+// ADMIN PANEL
+// ═══════════════════════════════════════════
+const ADMIN_PW = 'Travclan@12';
+const LS_KEY   = 'ct_thailand_rates';
+
+const DEFAULT_RATES = {
+  flights: {
+    Delhi:     { Phuket:{May:29000,June:30000,July:30000,August:28000}, Bangkok:{May:30000,June:31000,July:31000,August:29000} },
+    Mumbai:    { Phuket:{May:25000,June:26000,July:26000,August:24000}, Bangkok:{May:28000,June:29000,July:29000,August:27000} },
+    Bangalore: { Phuket:{May:34000,June:35000,July:35000,August:33000}, Bangkok:{May:32000,June:33000,July:33000,August:31000} },
+    Ahmedabad: { Phuket:{May:29000,June:30000,July:30000,August:28000}, Bangkok:{May:30000,June:31000,July:31000,August:29000} }
+  },
+  infantFlight: 10000,
+  hotels: {
+    Bangkok: { name:'The Ecotel Hotel', room:'Superior Room', meal:'Breakfast Only', perNight:4000, stars:3 },
+    Pattaya: { name:'Mind Resort',      room:'Superior Room', meal:'Breakfast Only', perNight:5000, stars:3 },
+    Phuket:  { name:'The Aim Patong',   room:'Deluxe Room',   meal:'Breakfast Only', perNight:6000, stars:4 },
+    Krabi:   { name:'Glow Aonang',      room:'Superior Room', meal:'Breakfast Only', perNight:7000, stars:4 }
+  },
+  itineraries: {
+    'Bangkok - Pattaya': {
+      4: { cost2pax:10000, childCost:10000 },
+      5: { cost2pax:15000, childCost:15000 },
+      6: { cost2pax:20000, childCost:20000 }
+    },
+    'Phuket - Krabi': {
+      4: { cost2pax:10000, childCost:10000 },
+      5: { cost2pax:15000, childCost:15000 },
+      6: { cost2pax:20000, childCost:20000 }
+    }
+  }
+};
+
+// Rates loaded from Firebase on init (see initRates above)
+
+
+function openAdminLogin() {
+  document.getElementById('adminOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('adminPwInput').focus(), 100);
+}
+function closeAdminLogin() {
+  document.getElementById('adminOverlay').classList.remove('open');
+  document.getElementById('adminPwInput').value = '';
+  document.getElementById('adminPwErr').style.display = 'none';
+}
+function checkAdminPw() {
+  const pw = document.getElementById('adminPwInput').value;
+  if (pw === ADMIN_PW) {
+    closeAdminLogin();
+    openAdminScreen();
+  } else {
+    document.getElementById('adminPwErr').style.display = 'block';
+    document.getElementById('adminPwInput').value = '';
+    document.getElementById('adminPwInput').focus();
+  }
+}
+
+function openAdminScreen() {
+  ['screenForm','screenQuote'].forEach(s => document.getElementById(s).classList.remove('active'));
+  document.getElementById('screenAdmin').classList.add('active');
+  renderAdminPanel();
+  window.scrollTo(0,0);
+}
+
+function adminLogout() {
+  document.getElementById('screenAdmin').classList.remove('active');
+  document.getElementById('screenForm').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function renderAdminPanel() {
+  // ── FLIGHTS ──
+  const cities  = ['Delhi','Mumbai','Bangalore','Ahmedabad'];
+  const dests   = ['Bangkok','Phuket'];
+  const months  = ['May','June','July','August'];
+  let flightRows = '';
+  cities.forEach(city => {
+    dests.forEach(dest => {
+      flightRows += `<tr>
+        <td>${city} → ${dest}</td>
+        ${months.map(m => `<td><input type="number" class="admin-input" id="f_${city}_${dest}_${m}" value="${RATES.flights[city][dest][m]}" style="width:90px;" /></td>`).join('')}
+      </tr>`;
+    });
+  });
+  document.getElementById('flightRatesBody').innerHTML = flightRows;
+  document.getElementById('infantFare').value = RATES.infantFlight;
+
+  // ── HOTELS ──
+  const hotelCities = ['Bangkok','Pattaya','Phuket','Krabi'];
+  let hotelHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">';
+  hotelCities.forEach(city => {
+    const h = RATES.hotels[city];
+    hotelHTML += `
+      <div style="background:var(--ct-surface);border:0.5px solid var(--ct-border);border-radius:12px;padding:16px 18px;">
+        <div style="font-size:13px;font-weight:600;color:var(--ct-orange);margin-bottom:12px;">${city}</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="admin-field"><label>Hotel Name</label><input type="text" class="admin-input" id="h_${city}_name" value="${h.name}" /></div>
+          <div class="admin-field"><label>Per Night Rate (₹)</label><input type="number" class="admin-input" id="h_${city}_rate" value="${h.perNight}" /></div>
+        </div>
+      </div>`;
+  });
+  hotelHTML += '</div>';
+  document.getElementById('hotelRatesBody').innerHTML = hotelHTML;
+
+  // ── ITINERARY ──
+  const circuits = ['Bangkok - Pattaya','Phuket - Krabi'];
+  const nights   = [4,5,6];
+  let itinHTML   = '';
+  circuits.forEach(circuit => {
+    itinHTML += `
+      <div style="margin-bottom:20px;">
+        <div style="font-size:12px;font-weight:600;color:var(--ct-orange);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;">${circuit}</div>
+        <table class="admin-table">
+          <thead><tr><th>Duration</th><th>2-Pax Base Cost (₹)</th><th>Per Child Cost (₹)</th></tr></thead>
+          <tbody>`;
+    nights.forEach(n => {
+      const it = RATES.itineraries[circuit][n];
+      const key = circuit.replace(/ /g,'_').replace(/-/g,'');
+      itinHTML += `<tr>
+        <td>${n} Nights</td>
+        <td><input type="number" class="admin-input" id="i_${key}_${n}_base" value="${it.cost2pax}" style="width:140px;" /></td>
+        <td><input type="number" class="admin-input" id="i_${key}_${n}_child" value="${it.childCost}" style="width:140px;" /></td>
+      </tr>`;
+    });
+    itinHTML += '</tbody></table></div>';
+  });
+  document.getElementById('itinRatesBody').innerHTML = itinHTML;
+}
+
+function saveRates() {
+  const cities  = ['Delhi','Mumbai','Bangalore','Ahmedabad'];
+  const dests   = ['Bangkok','Phuket'];
+  const months  = ['May','June','July','August'];
+
+  // Flights
+  cities.forEach(city => {
+    dests.forEach(dest => {
+      months.forEach(m => {
+        const v = parseInt(document.getElementById(`f_${city}_${dest}_${m}`).value);
+        if (!isNaN(v)) RATES.flights[city][dest][m] = v;
+      });
+    });
+  });
+  const inf = parseInt(document.getElementById('infantFare').value);
+  if (!isNaN(inf)) RATES.infantFlight = inf;
+
+  // Hotels
+  ['Bangkok','Pattaya','Phuket','Krabi'].forEach(city => {
+    const name = document.getElementById(`h_${city}_name`).value.trim();
+    const rate = parseInt(document.getElementById(`h_${city}_rate`).value);
+    if (name) RATES.hotels[city].name = name;
+    if (!isNaN(rate)) RATES.hotels[city].perNight = rate;
+  });
+
+  // Itinerary
+  const circuits = ['Bangkok - Pattaya','Phuket - Krabi'];
+  circuits.forEach(circuit => {
+    const key = circuit.replace(/ /g,'_').replace(/-/g,'');
+    [4,5,6].forEach(n => {
+      const base  = parseInt(document.getElementById(`i_${key}_${n}_base`).value);
+      const child = parseInt(document.getElementById(`i_${key}_${n}_child`).value);
+      if (!isNaN(base))  RATES.itineraries[circuit][n].cost2pax  = base;
+      if (!isNaN(child)) RATES.itineraries[circuit][n].childCost = child;
+    });
+  });
+
+  // Persist to localStorage
+  const toSave = {
+    flights: RATES.flights,
+    infantFlight: RATES.infantFlight,
+    hotels: {
+      Bangkok: { name:RATES.hotels.Bangkok.name, perNight:RATES.hotels.Bangkok.perNight },
+      Pattaya: { name:RATES.hotels.Pattaya.name, perNight:RATES.hotels.Pattaya.perNight },
+      Phuket:  { name:RATES.hotels.Phuket.name,  perNight:RATES.hotels.Phuket.perNight  },
+      Krabi:   { name:RATES.hotels.Krabi.name,   perNight:RATES.hotels.Krabi.perNight   }
+    },
+    itineraries: {
+      'Bangkok - Pattaya': {
+        4: { cost2pax:RATES.itineraries['Bangkok - Pattaya'][4].cost2pax, childCost:RATES.itineraries['Bangkok - Pattaya'][4].childCost },
+        5: { cost2pax:RATES.itineraries['Bangkok - Pattaya'][5].cost2pax, childCost:RATES.itineraries['Bangkok - Pattaya'][5].childCost },
+        6: { cost2pax:RATES.itineraries['Bangkok - Pattaya'][6].cost2pax, childCost:RATES.itineraries['Bangkok - Pattaya'][6].childCost }
+      },
+      'Phuket - Krabi': {
+        4: { cost2pax:RATES.itineraries['Phuket - Krabi'][4].cost2pax, childCost:RATES.itineraries['Phuket - Krabi'][4].childCost },
+        5: { cost2pax:RATES.itineraries['Phuket - Krabi'][5].cost2pax, childCost:RATES.itineraries['Phuket - Krabi'][5].childCost },
+        6: { cost2pax:RATES.itineraries['Phuket - Krabi'][6].cost2pax, childCost:RATES.itineraries['Phuket - Krabi'][6].childCost }
+      }
+    }
+  };
+  localStorage.setItem(LS_KEY, JSON.stringify(toSave));
+
+  // Show saved toast
+  const t = document.getElementById('savedToast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function resetToDefaults() {
+  if (!confirm('Reset ALL rates to original defaults? This cannot be undone.')) return;
+  localStorage.removeItem(LS_KEY);
+
+  // Restore defaults into RATES
+  ['Delhi','Mumbai','Bangalore','Ahmedabad'].forEach(city => {
+    ['Phuket','Bangkok'].forEach(dest => {
+      ['May','June','July','August'].forEach(month => {
+        RATES.flights[city][dest][month] = DEFAULT_RATES.flights[city][dest][month];
+      });
+    });
+  });
+  RATES.infantFlight = DEFAULT_RATES.infantFlight;
+  ['Bangkok','Pattaya','Phuket','Krabi'].forEach(city => {
+    RATES.hotels[city].name     = DEFAULT_RATES.hotels[city].name;
+    RATES.hotels[city].perNight = DEFAULT_RATES.hotels[city].perNight;
+  });
+  ['Bangkok - Pattaya','Phuket - Krabi'].forEach(circuit => {
+    [4,5,6].forEach(n => {
+      RATES.itineraries[circuit][n].cost2pax  = DEFAULT_RATES.itineraries[circuit][n].cost2pax;
+      RATES.itineraries[circuit][n].childCost = DEFAULT_RATES.itineraries[circuit][n].childCost;
+    });
+  });
+  renderAdminPanel();
+
+  // Push reset defaults to Firebase too
+  pushRatesToFirebase().then(() => {
+    localStorage.removeItem('ct_thailand_rates');
+    const t = document.getElementById('savedToast');
+    t.style.background = '#378ADD';
+    t.innerHTML = '<i class="ti ti-refresh"></i> Rates reset to defaults & synced!';
+    t.classList.add('show');
+    setTimeout(() => { t.classList.remove('show'); t.style.background=''; t.innerHTML='<i class="ti ti-circle-check"></i> Rates saved successfully!'; }, 2800);
+  }).catch(e => alert('Reset sync error: ' + e.message));
+}
+
+</script>
+</body>
+</html>
